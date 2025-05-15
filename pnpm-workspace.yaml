@@ -1,0 +1,2 @@
+onlyBuiltDependencies:
+  - test-server-sdk

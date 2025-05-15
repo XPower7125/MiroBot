@@ -9,8 +9,9 @@ import fs from "fs";
 import path from "path";
 
 import dotenv from "dotenv";
-import { type CommandType } from "./types";
+import type { ClientType, EventType, CommandType } from "./types.js";
 import { fileURLToPath } from "url";
+import { getVoiceChannels, hasMembers, playAudio } from "./utils/voice.js";
 
 console.log("Starting up Misty");
 
@@ -24,18 +25,22 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildVoiceStates,
   ],
-}) as Client<boolean> & { commands: Collection<string, CommandType> };
+}) as ClientType;
 
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, "commands");
-const commandFolders = fs.readdirSync(foldersPath);
+client.events = new Collection();
+const commandsFoldersPath = path.join(__dirname, "commands");
+const commandFolders = fs.readdirSync(commandsFoldersPath);
+const eventsPath = path.join(__dirname, "events");
+const eventFiles = fs.readdirSync(eventsPath);
 
 for (const folder of commandFolders) {
-  const commandsPath = path.join(foldersPath, folder);
+  const commandsPath = path.join(commandsFoldersPath, folder);
   const commandFiles = fs
     .readdirSync(commandsPath)
-    .filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
+    .filter((file) => file.endsWith(".js") || file.endsWith(""));
   for (const file of commandFiles) {
     const filePath = new URL("file://" + path.join(commandsPath, file));
     const command = (await import(filePath.toString())).default as CommandType;
@@ -51,8 +56,42 @@ for (const folder of commandFolders) {
   }
 }
 
+for (const file of eventFiles) {
+  const filePath = new URL("file://" + path.join(eventsPath, file));
+  const event = (await import(filePath.toString())).default as EventType;
+  client.on(event.eventType, (...args: unknown[]) => {
+    console.log(args);
+    event.execute(client, ...args);
+  });
+  client.events.set(event.eventType, event);
+}
+
+async function playMeowOnGuilds() {
+  const guilds = client.guilds.cache.filter(
+    (guild) => guild.members.cache.filter((member) => member.user.bot).size > 0
+  );
+  guilds.forEach(async (guild) => {
+    getVoiceChannels(guild).forEach(async (channel) => {
+      console.log("Got channel " + channel.name);
+      if (hasMembers(channel)) {
+        console.log("Has members");
+        const randomValue = Math.random();
+        console.log(randomValue);
+        if (channel.name === "121.5") {
+          console.log("Meowing on guard!");
+        }
+        if (randomValue < 0.25 || channel.name === "121.5") {
+          await playAudio(channel, "assets/meow.mp3");
+        }
+      }
+    });
+  });
+}
+
 client.once(Events.ClientReady, () => {
   console.log("Ready!");
+  setTimeout(playMeowOnGuilds, 1000 * 60 * 5);
+  playMeowOnGuilds();
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {

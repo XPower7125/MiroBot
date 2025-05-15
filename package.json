@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/main.ts",
   "scripts": {
-    "dev": "chokidar \"src/commands/**/*.{ts,tsx,js}\" \"src/*.ts\" -c \"pnpm tsx src/main.ts\" --verbose --initial"
+    "dev": "chokidar \"src/commands/**/*.{ts,tsx,js}\" \"src/events/*.{ts,tsx,js}\" \"src/*.ts\" -c \"pnpm tsx src/main.ts\" --verbose --initial"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,8 @@
     "typescript-eslint": "^8.32.1"
   },
   "dependencies": {
+    "@discordjs/voice": "^0.18.0",
+    "@google/genai": "^0.14.0",
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0"
   }
