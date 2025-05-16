@@ -1,10 +1,15 @@
-import { Client, Collection, SlashCommandBuilder } from "discord.js";
+import {
+  Client,
+  Collection,
+  SlashCommandBuilder,
+  type Interaction,
+} from "discord.js";
 
 // Types
 
 export interface CommandType {
   data: SlashCommandBuilder;
-  execute: (Interaction) => void;
+  execute: (interaction: Interaction) => void;
 }
 
 export type ClientType = Client<boolean> & {
