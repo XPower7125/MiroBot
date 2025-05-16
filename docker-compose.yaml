@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  misty-bot:
+    build: .
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - BOT_CLIENT_ID=${BOT_CLIENT_ID}
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+      - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    restart: unless-stopped
