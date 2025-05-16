@@ -45,6 +45,6 @@ RUN echo "=== Production Container File Structure ===" && \
 ENV NODE_ENV=production
 # Attempt multiple ways to start the application with extensive logging
 CMD echo "Starting application..." && \
-    ls -la && \
+    ls -la * && \
     cd /app && \
     node dist/main.js
