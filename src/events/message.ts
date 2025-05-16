@@ -6,19 +6,46 @@ import { Ratelimit } from "@upstash/ratelimit";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(25, "12 h"),
+  limiter: Ratelimit.slidingWindow(25, "5 h"),
 });
 
-type MyMessageType = Message & {
+interface MyMessageType {
+  content: string;
+  author: {
+    id: string;
+    username: string;
+    discriminator: string;
+    bot: boolean;
+    system: boolean;
+  };
   isLatest: boolean;
-};
+  reference?: { messageId: string | null };
+  attachments: { size: number }[];
+  cleanContent: string;
+}
 
 async function recursivelyFetchMessage(
-  message: Message<boolean>,
+  message: Message,
   limit: number
 ): Promise<MyMessageType[]> {
-  // @ts-expect-error something is wrong with the typings
-  const messages: MyMessageType[] = [{ ...message, isLatest: true }];
+  const messages: MyMessageType[] = [
+    {
+      isLatest: true,
+      attachments: message.attachments.map((attachment) => ({
+        size: attachment.size,
+      })),
+      cleanContent: message.cleanContent,
+      author: {
+        id: message.author.id,
+        username: message.author.username,
+        discriminator: message.author.discriminator,
+        bot: message.author.bot,
+        system: message.author.system,
+      },
+      reference: { messageId: message.reference?.messageId ?? null },
+      content: message.content,
+    },
+  ];
   let currentMessage = message;
   let count = 0;
 
@@ -33,8 +60,23 @@ async function recursivelyFetchMessage(
     )
       nextMessage.content =
         "{{MYSELF}} - Already responded. You do NOT need to send {{MYSELF}} again.";
-    // @ts-expect-error something is wrong with the typings
-    messages.push({ ...nextMessage, isLatest: false });
+
+    messages.push({
+      isLatest: true,
+      attachments: nextMessage.attachments.map((attachment) => ({
+        size: attachment.size,
+      })),
+      cleanContent: nextMessage.cleanContent,
+      author: {
+        id: nextMessage.author.id,
+        username: nextMessage.author.username,
+        discriminator: nextMessage.author.discriminator,
+        bot: nextMessage.author.bot,
+        system: nextMessage.author.system,
+      },
+      reference: { messageId: nextMessage.reference?.messageId ?? null },
+      content: nextMessage.content,
+    });
     currentMessage = nextMessage;
     count++;
   }
@@ -60,7 +102,9 @@ export default {
     )
       return;
     const { success } = await ratelimit.limit(message.author.id);
-    if (!success) return;
+    if (!success) {
+      return;
+    }
     await message.channel.sendTyping();
     const fullMessage = await recursivelyFetchMessage(message, 4);
 
