@@ -35,7 +35,7 @@ RUN npm install -g pnpm && \
 
 # Set environment variables
 ENV NODE_ENV=production
-CMD ["ls", "*"]
+
 # Command to run the compiled code
 # ENTRYPOINT ["node", "dist/main.js"]
 ENTRYPOINT [ "/bin/sh" ]
