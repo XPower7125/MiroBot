@@ -5,17 +5,19 @@ FROM node:20-alpine3.20 AS builder
 WORKDIR /build
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Install pnpm globally
+RUN npm install -g pnpm
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
 
 # Copy source files and tsconfig
 COPY tsconfig.json ./
 COPY src/ ./src/
 
-# Install pnpm globally
-RUN npm install -g pnpm
-
-# Install dependencies and build
-RUN pnpm install --frozen-lockfile
+# Build TypeScript files
 RUN pnpm tsc
 
 # Create production image
@@ -26,8 +28,9 @@ WORKDIR /app
 # Copy only the compiled JavaScript files and assets
 COPY --from=builder /build/dist ./dist
 COPY assets/ ./assets/
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Add debug logging to list root directory contents
+RUN ls -la /
 
 # Install production dependencies only
 RUN npm install -g pnpm && \
@@ -37,5 +40,4 @@ RUN npm install -g pnpm && \
 ENV NODE_ENV=production
 
 # Command to run the compiled code
-# ENTRYPOINT ["node", "dist/main.js"]
-ENTRYPOINT [ "/bin/sh" ]
+CMD ["node", "dist/main.js"]
