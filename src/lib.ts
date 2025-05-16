@@ -49,7 +49,7 @@ export async function genMistyOutput(text: string) {
       },
     ],
   };
-  const model = "gemini-2.0-flash";
+  const model = "gemini-2.0-flash-lite";
   const contents = [
     {
       role: "user",
