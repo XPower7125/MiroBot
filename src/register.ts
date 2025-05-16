@@ -11,12 +11,12 @@ const __dirname = path.dirname(__filename);
 config();
 interface Command {
   data: {
-    toJSON: () => any;
+    toJSON: () => unknown;
   };
-  execute: (...args: any[]) => unknown;
+  execute: (...args: unknown[]) => unknown;
 }
 
-const commands: any[] = [];
+const commands: unknown[] = [];
 
 // Grab all the command folders from the commands directory
 const foldersPath = path.join(__dirname, "commands");
@@ -59,13 +59,16 @@ const rest = new REST().setToken(env.BOT_TOKEN ?? "");
 
     // Fully refresh all commands in the guild
     const data = await rest.put(
-      Routes.applicationGuildCommands(env.BOT_CLIENT_ID, env.BOT_GUILD_ID),
+      Routes.applicationGuildCommands(
+        env.BOT_CLIENT_ID ?? "",
+        env.BOT_GUILD_ID ?? ""
+      ),
       { body: commands }
     );
 
     console.log(
       `Successfully reloaded ${
-        (data as any[]).length
+        (data as unknown[]).length
       } application (/) commands.`
     );
   } catch (error) {
