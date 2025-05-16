@@ -17,8 +17,9 @@ RUN pnpm install --frozen-lockfile
 COPY tsconfig.json ./
 COPY src/ ./src/
 
-# Build TypeScript files
-RUN pnpm tsc
+# Build TypeScript files and verify output
+RUN pnpm tsc && \
+    ls -la dist/
 
 # Create production image
 FROM node:20-alpine3.20
@@ -29,12 +30,13 @@ WORKDIR /app
 COPY --from=builder /build/dist ./dist
 COPY assets/ ./assets/
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# Add debug logging to list root directory contents
-RUN ls -la /
 
 # Install production dependencies only
 RUN npm install -g pnpm && \
     pnpm install --prod --frozen-lockfile
+
+# Verify files are in place
+RUN ls -la /app/dist/
 
 # Set environment variables
 ENV NODE_ENV=production
