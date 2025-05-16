@@ -1,5 +1,5 @@
 # Use Node.js LTS version as the base image
-FROM node:20-slim AS builder
+FROM 20-alpine3.20 AS builder
 
 # Set working directory
 WORKDIR /build
@@ -19,7 +19,7 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm tsc
 
 # Create production image
-FROM node:20-slim
+FROM 20-alpine3.20
 
 WORKDIR /app
 
