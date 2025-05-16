@@ -20,7 +20,9 @@ RUN pnpm run build || pnpm tsc || echo "Build command failed, checking for prebu
 RUN echo "=== JS Files in the project ===" && \
     find /build -type f -name "*.js" | sort && \
     echo "=== Directory Structure ===" && \
-    find /build -type d | sort
+    find /build -type d | sort && \
+    echo "=== Assets ===" && \
+    find /build -type f -name "*.mp3" | sort
 
 # Create production image
 FROM node:20-alpine3.20
@@ -29,7 +31,6 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # Copy ALL files from builder to ensure we don't miss anything
 COPY --from=builder /build/ ./
-COPY --from=builder /assets/ ./
 # Install production dependencies only
 RUN npm install -g pnpm && \
     pnpm install --prod --frozen-lockfile
