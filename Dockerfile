@@ -11,28 +11,57 @@ RUN pnpm install --frozen-lockfile
 # Copy source files and tsconfig
 COPY tsconfig.json ./
 COPY src/ ./src/
-# Build TypeScript files and verify output
-RUN pnpm run build || pnpm tsc
-# Print directory contents to verify where files are built
-RUN find . -type f -name "*.js" | sort
+# Check tsconfig.json for outDir setting
+RUN cat tsconfig.json || echo "No tsconfig.json found"
+# Try different build commands
+RUN pnpm run build || pnpm tsc || echo "Build command failed, checking for prebuilt files"
+# Debug: Print directory contents to verify where files are built
+RUN echo "=== JS Files in the project ===" && \
+    find /build -type f -name "*.js" | sort && \
+    echo "=== Directory Structure ===" && \
+    find /build -type d | sort
 
 # Create production image
 FROM node:20-alpine3.20
 WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# Copy assets
-COPY assets/ ./assets/
-# Find and copy the built files from the builder stage
-COPY --from=builder /build/dist/ ./dist/
-# Also copy the src directory in case compiled JS files are output there
-COPY --from=builder /build/src/ ./src/
+# Copy ALL files from builder to ensure we don't miss anything
+COPY --from=builder /build/ ./
 # Install production dependencies only
 RUN npm install -g pnpm && \
     pnpm install --prod --frozen-lockfile
-# Verify files are in place
-RUN find /app -type f -name "*.js" | sort
+# Debug: Verify files are in place with detailed listing
+RUN echo "=== Production Container File Structure ===" && \
+    find /app -type d | sort && \
+    echo "=== JS Files in Production Container ===" && \
+    find /app -type f -name "*.js" | sort && \
+    echo "=== Package.json Main Entry Point ===" && \
+    grep '"main"' package.json || echo "No main field in package.json"
 # Set environment variables
 ENV NODE_ENV=production
-# Use a more flexible approach to find and run the main.js file
-CMD find /app -name "main.js" -type f -exec node {} \;
+# Attempt multiple ways to start the application with extensive logging
+CMD echo "Starting application..." && \
+    ls -la && \
+    if grep -q '"main"' package.json; then \
+    echo "Starting via package.json main entry point" && \
+    MAIN_FILE=$(grep -o '"main"[[:space:]]*:[[:space:]]*"[^"]*"' package.json | cut -d'"' -f4) && \
+    echo "Main file from package.json: $MAIN_FILE" && \
+    node "$MAIN_FILE"; \
+    elif [ -f "dist/main.js" ]; then \
+    echo "Starting dist/main.js" && \
+    node dist/main.js; \
+    elif [ -f "dist/index.js" ]; then \
+    echo "Starting dist/index.js" && \
+    node dist/index.js; \
+    elif [ -f "src/main.js" ]; then \
+    echo "Starting src/main.js" && \
+    node src/main.js; \
+    elif [ -f "src/index.js" ]; then \
+    echo "Starting src/index.js" && \
+    node src/index.js; \
+    else \
+    echo "Cannot find main entry point. Files in current directory:" && \
+    find /app -type f -name "*.js" | sort && \
+    exit 1; \
+    fi
