@@ -15,7 +15,7 @@ COPY src/ ./src/
 RUN npm install -g pnpm
 
 # Install dependencies and build
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 RUN pnpm tsc
 
 # Create production image
