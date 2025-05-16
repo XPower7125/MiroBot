@@ -1,6 +1,13 @@
 import { Message, type OmitPartialGroupDMChannel } from "discord.js";
 import type { ClientType } from "../types.js";
 import { genMistyOutput } from "../lib.js";
+import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(25, "12 h"),
+});
 
 type MyMessageType = Message & {
   isLatest: boolean;
@@ -52,6 +59,8 @@ export default {
       completeMessageReference?.author.id !== client.user?.id
     )
       return;
+    const { success } = await ratelimit.limit(message.author.id);
+    if (!success) return;
     await message.channel.sendTyping();
     const fullMessage = await recursivelyFetchMessage(message, 4);
 
