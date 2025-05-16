@@ -15,7 +15,7 @@ COPY src/ ./src/
 RUN npm install -g pnpm
 
 # Install dependencies and build
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --frozen-lockfile
 RUN pnpm tsc
 
 # Create production image
@@ -27,13 +27,14 @@ WORKDIR /app
 COPY --from=builder /build/dist ./dist
 COPY assets/ ./assets/
 COPY package.json ./
+COPY pnpm-lock.yaml ./
 
 # Install production dependencies only
 RUN npm install -g pnpm && \
-    pnpm install --prod --no-frozen-lockfile
+    pnpm install --prod --frozen-lockfile
 
 # Set environment variables
 ENV NODE_ENV=production
-
+CMD ["ls", "*"]
 # Command to run the compiled code
-CMD ["node", "dist/main.js"]
+ENTRYPOINT ["node", "dist/main.js"]
