@@ -30,7 +30,7 @@ COPY package.json ./
 
 # Install production dependencies only
 RUN npm install -g pnpm && \
-    pnpm install --prod --frozen-lockfile
+    pnpm install --prod --no-frozen-lockfile
 
 # Set environment variables
 ENV NODE_ENV=production
