@@ -59,7 +59,7 @@ export async function genMistyOutput(messages: Message[]) {
   const response = await ai.models.generateContent({
     model,
     config,
-    contents: messages.reverse().map((message) => ({
+    contents: messages.map((message) => ({
       role: message.author.bot ? "assistant" : "user",
       parts: [
         {
