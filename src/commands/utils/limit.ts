@@ -7,7 +7,7 @@ import {
   SlashCommandBuilder,
   TextDisplayBuilder,
 } from "discord.js";
-import { increaseLimit, ratelimit } from "~/utils/ratelimit.js";
+import { increaseLimit, ratelimit } from "../../utils/ratelimit.js";
 
 export default {
   data: new SlashCommandBuilder()
