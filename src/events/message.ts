@@ -9,43 +9,11 @@ const ratelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(25, "5 h"),
 });
 
-interface MyMessageType {
-  content: string;
-  author: {
-    id: string;
-    username: string;
-    discriminator: string;
-    bot: boolean;
-    system: boolean;
-  };
-  isLatest: boolean;
-  reference?: { messageId: string | null };
-  attachments: { size: number }[];
-  cleanContent: string;
-}
-
 async function recursivelyFetchMessage(
   message: Message,
   limit: number
-): Promise<MyMessageType[]> {
-  const messages: MyMessageType[] = [
-    {
-      isLatest: true,
-      attachments: message.attachments.map((attachment) => ({
-        size: attachment.size,
-      })),
-      cleanContent: message.cleanContent,
-      author: {
-        id: message.author.id,
-        username: message.author.username,
-        discriminator: message.author.discriminator,
-        bot: message.author.bot,
-        system: message.author.system,
-      },
-      reference: { messageId: message.reference?.messageId ?? null },
-      content: message.content,
-    },
-  ];
+): Promise<Message[]> {
+  const messages: Message[] = [message];
   let currentMessage = message;
   let count = 0;
 
@@ -61,22 +29,7 @@ async function recursivelyFetchMessage(
       nextMessage.content =
         "{{MYSELF}} - Already responded. You do NOT need to send {{MYSELF}} again.";
 
-    messages.push({
-      isLatest: true,
-      attachments: nextMessage.attachments.map((attachment) => ({
-        size: attachment.size,
-      })),
-      cleanContent: nextMessage.cleanContent,
-      author: {
-        id: nextMessage.author.id,
-        username: nextMessage.author.username,
-        discriminator: nextMessage.author.discriminator,
-        bot: nextMessage.author.bot,
-        system: nextMessage.author.system,
-      },
-      reference: { messageId: nextMessage.reference?.messageId ?? null },
-      content: nextMessage.content,
-    });
+    messages.push(nextMessage);
     currentMessage = nextMessage;
     count++;
   }
@@ -106,10 +59,9 @@ export default {
       return;
     }
     await message.channel.sendTyping();
-    const fullMessage = await recursivelyFetchMessage(message, 4);
+    const messages = await recursivelyFetchMessage(message, 4);
 
-    console.log(JSON.stringify(fullMessage));
-    const output = await genMistyOutput(JSON.stringify(fullMessage));
+    const output = await genMistyOutput(messages);
     console.log(output);
     if (output?.includes("{{MYSELF}}")) {
       const imageResponse = await fetch("https://starnumber.lol/misty");
