@@ -65,11 +65,20 @@ const rest = new REST().setToken(env.BOT_TOKEN ?? "");
       ),
       { body: commands }
     );
+    const globalData = await rest.put(
+      Routes.applicationCommands(env.BOT_CLIENT_ID ?? ""),
+      { body: commands }
+    );
 
     console.log(
       `Successfully reloaded ${
         (data as unknown[]).length
-      } application (/) commands.`
+      } guild application (/) commands.`
+    );
+    console.log(
+      `Successfully reloaded ${
+        (globalData as unknown[]).length
+      } global application (/) commands.`
     );
   } catch (error) {
     console.error(error);

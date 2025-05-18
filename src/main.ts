@@ -82,6 +82,7 @@ async function playMeowOnGuilds() {
         }
         if (randomValue < 0.25 || channel.name === "121.5") {
           await playAudio(channel, "assets/meow.mp3");
+          console.log("Meowed successfully!");
         }
       }
     });

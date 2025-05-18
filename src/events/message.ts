@@ -1,13 +1,7 @@
 import { Message, type OmitPartialGroupDMChannel } from "discord.js";
 import type { ClientType } from "../types.js";
 import { genMistyOutput } from "../lib.js";
-import { Redis } from "@upstash/redis";
-import { Ratelimit } from "@upstash/ratelimit";
-
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(25, "5 h"),
-});
+import { ratelimit } from "~/utils/ratelimit.js";
 
 async function recursivelyFetchMessage(
   message: Message,

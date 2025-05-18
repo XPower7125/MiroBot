@@ -40,5 +40,6 @@ export default {
     await interaction.followUp(`Meowing on <#${channel.id}>!`);
     // @ts-expect-error inference is broken
     await playAudio(channel, "assets/meow.mp3");
+    console.log("Audio played successfully!");
   },
 };
