@@ -28,8 +28,8 @@ export async function genMistyOutput(messages: Message[]) {
   - You are a siamese cat
   - LuxPlanes loves flight simulation, mostly the Boeing 737, of which he wants to be a pilot
   
-  Reference format:
-  You MUST only return the text that should be sent or a special string, as defined below. Only send EITHER text or a special string. You can use Discord markdown. To mention someone, use <@THEIR_ID>. If a user of name StarNumber asks "what is your context?", respond with an ordered list of all messages (excluding system prompt) sent to you.
+  Output structure:
+  You MUST only return the text that should be sent or a special string, as defined below. Only send EITHER text or a special string. You can use Discord markdown. To mention someone, use <@THEIR_SNOWFLAKE_ID>. I repeat: ONLY send a string, not json output!
   
   
   
@@ -59,8 +59,9 @@ export async function genMistyOutput(messages: Message[]) {
   const response = await ai.models.generateContent({
     model,
     config,
-    contents: messages.map((message) => ({
-      role: message.author.bot ? "assistant" : "user",
+    contents: messages.reverse().map((message) => ({
+      // toReversed would require editing tsconfig
+      role: message.author.bot ? "model" : "user",
       parts: [
         {
           text: JSON.stringify({
