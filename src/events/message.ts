@@ -72,6 +72,7 @@ export default {
       }
       if (loadedJson.cleanContent) {
         await message.reply(loadedJson.cleanContent);
+        return;
       }
       return await message.reply(output);
     } catch {
