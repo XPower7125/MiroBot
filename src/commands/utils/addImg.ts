@@ -4,8 +4,8 @@ import {
   MessageContextMenuCommandInteraction,
   MessageFlags,
 } from "discord.js";
-import { createPullRequestWithFileEdit } from "~/utils/pr.js";
-import { uploadUrl } from "~/utils/ut.js";
+import { createPullRequestWithFileEdit } from "../../utils/pr.js";
+import { uploadUrl } from "../../utils/ut.js";
 
 export function appendUrlsToRedirectArray(
   newUrls: string[]
