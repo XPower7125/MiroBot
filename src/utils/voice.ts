@@ -4,8 +4,10 @@ import {
   createAudioPlayer,
   createAudioResource,
   AudioPlayerStatus,
+  StreamType,
 } from "@discordjs/voice";
 import { join } from "path";
+import type { ClientType } from "~/types.js";
 
 /**
  * Gets all voice channels in a guild
@@ -54,4 +56,64 @@ export async function playAudio(channel: VoiceChannel, filename: string) {
       resolve(true);
     });
   });
+}
+
+export async function playAudioPlaylist(
+  channel: VoiceChannel,
+  filenames: string[],
+  playlistPath: string
+) {
+  if (filenames.length === 0) return;
+
+  const connection = joinChannel(channel);
+  const player = createAudioPlayer();
+  (channel.client as ClientType).players.set(channel.guild.id, player);
+  console.log("Player created");
+  console.log((channel.client as ClientType).players.get(channel.guild.id));
+  connection.subscribe(player);
+
+  let currentIndex = 0;
+
+  function playCurrentSong() {
+    const filename = filenames[currentIndex];
+    const filePath = join(process.cwd(), playlistPath, filename ?? "");
+    console.log(`Playing ${filename}`);
+    console.log(filePath);
+
+    // Create a fresh audio resource each time
+    const resource = createAudioResource(filePath, {
+      inputType: StreamType.Arbitrary,
+    });
+
+    player.play(resource);
+  }
+
+  // Set up event listeners
+  player.on(AudioPlayerStatus.Playing, () => {
+    console.log("Audio started playing");
+  });
+
+  player.on(AudioPlayerStatus.Idle, () => {
+    console.log("Audio finished, moving to next");
+    currentIndex = (currentIndex + 1) % filenames.length;
+
+    // Small delay before playing next song
+    setTimeout(() => {
+      playCurrentSong();
+    }, 500);
+  });
+
+  // Handle errors
+  player.on("error", (error) => {
+    console.error("Audio player error:", error);
+    currentIndex = (currentIndex + 1) % filenames.length;
+    setTimeout(() => {
+      playCurrentSong();
+    }, 500);
+  });
+
+  // Start playing the first song
+  playCurrentSong();
+
+  return player; // Return player so you can control it externally if needed
 }

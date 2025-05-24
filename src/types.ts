@@ -1,3 +1,4 @@
+import type { AudioPlayer } from "@discordjs/voice";
 import {
   Client,
   Collection,
@@ -15,6 +16,7 @@ export interface CommandType {
 export type ClientType = Client<boolean> & {
   commands: Collection<string, CommandType>;
   events: Collection<string, EventType>;
+  players: Collection<string, AudioPlayer>;
 };
 
 export interface EventType {
