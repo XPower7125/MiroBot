@@ -118,10 +118,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
           flags: MessageFlags.Ephemeral,
         });
       } else {
-        await interaction.reply({
-          content: "There was an error while executing this command!",
-          flags: MessageFlags.Ephemeral,
-        });
+        try {
+          await interaction.reply({
+            content: "There was an error while executing this command!",
+            flags: MessageFlags.Ephemeral,
+          });
+        } catch (error) {
+          console.error(error);
+        }
       }
     }
   }
@@ -145,10 +149,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
           flags: MessageFlags.Ephemeral,
         });
       } else {
-        await interaction.reply({
-          content: "There was an error while executing this command!",
-          flags: MessageFlags.Ephemeral,
-        });
+        try {
+          await interaction.reply({
+            content: "There was an error while executing this command!",
+            flags: MessageFlags.Ephemeral,
+          });
+        } catch (error) {
+          console.error(error);
+        }
       }
     }
   }
