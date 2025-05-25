@@ -18,12 +18,6 @@ function formatFancyDuration(seconds: number): string {
     .join(" ");
 }
 
-function renderProgressBar(percent: number, width = 30): string {
-  const clamped = Math.max(0, Math.min(100, percent));
-  const filledLength = Math.round((clamped / 100) * width);
-  const bar = "█".repeat(filledLength) + "-".repeat(width - filledLength);
-  return `[${bar}] ${clamped.toFixed(1)}%`;
-}
 export default {
   data: new SlashCommandBuilder()
     .setName("song")

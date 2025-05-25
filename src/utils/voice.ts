@@ -72,10 +72,8 @@ export async function playAudioPlaylist(
   console.log((channel.client as ClientType).players.get(channel.guild.id));
   connection.subscribe(player);
 
-  let currentIndex = 0;
-
-  function playCurrentSong() {
-    const filename = filenames[currentIndex];
+  function playRandomSong() {
+    const filename = filenames[Math.floor(Math.random() * filenames.length)];
     const filePath = join(process.cwd(), playlistPath, filename ?? "");
     console.log(`Playing ${filename}`);
     console.log(filePath);
@@ -102,25 +100,24 @@ export async function playAudioPlaylist(
 
   player.on(AudioPlayerStatus.Idle, () => {
     console.log("Audio finished, moving to next");
-    currentIndex = (currentIndex + 1) % filenames.length;
 
     // Small delay before playing next song
     setTimeout(() => {
-      playCurrentSong();
+      playRandomSong();
     }, 500);
   });
 
   // Handle errors
   player.on("error", (error) => {
     console.error("Audio player error:", error);
-    currentIndex = (currentIndex + 1) % filenames.length;
+
     setTimeout(() => {
-      playCurrentSong();
+      playRandomSong();
     }, 500);
   });
 
   // Start playing the first song
-  playCurrentSong();
+  playRandomSong();
 
   return player; // Return player so you can control it externally if needed
 }
