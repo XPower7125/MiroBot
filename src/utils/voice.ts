@@ -83,7 +83,14 @@ export async function playAudioPlaylist(
     // Create a fresh audio resource each time
     const resource = createAudioResource(filePath, {
       inputType: StreamType.Arbitrary,
+      metadata: {
+        filename: filePath,
+      },
     });
+    (channel.client as ClientType).audioResources.set(
+      channel.guild.id,
+      resource
+    );
 
     player.play(resource);
   }

@@ -32,6 +32,7 @@ const client = new Client({
 client.commands = new Collection();
 client.events = new Collection();
 client.players = new Collection();
+client.audioResources = new Collection();
 const commandsFoldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(commandsFoldersPath);
 const eventsPath = path.join(__dirname, "events");
