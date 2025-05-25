@@ -48,9 +48,11 @@ export default {
       completeMessageReference?.author.id !== client.user?.id
     )
       return;
-    const { success } = await ratelimit.limit(message.author.id);
+    const { success, reset } = await ratelimit.limit(message.author.id);
     if (!success) {
-      return;
+      return await message.reply(
+        `You ran out of messages! Retry <t:${Math.floor(reset / 1000)}:R>`
+      );
     }
     await message.channel.sendTyping();
     const messages = await recursivelyFetchMessage(message, 4);
