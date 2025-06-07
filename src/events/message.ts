@@ -57,7 +57,7 @@ export default {
     await message.channel.sendTyping();
     const messages = await recursivelyFetchMessage(message, 4);
 
-    const output = await genMistyOutput(messages);
+    const output = await genMistyOutput(messages, client, message);
     console.log(output);
     if (output?.includes("{{MYSELF}}")) {
       const imageResponse = await fetch("https://starnumber.lol/misty");
@@ -86,7 +86,7 @@ export default {
         return;
       }
     }
-
+    console.log("OUTPUT", output);
     await message.reply(output);
   },
 };
