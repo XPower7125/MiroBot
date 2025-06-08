@@ -1,36 +1,31 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_version": "24.0.0",
+
   "compilerOptions": {
-    /* Base Options */
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
-    "outDir": "dist",
-    "rootDir": "src",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "allowJs": false,
-    "checkJs": false,
-    "isolatedModules": true,
-    "skipLibCheck": true,
-
-    /* Strictness */
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-
-    /* Module Syntax */
-    "moduleDetection": "force",
+    "outDir": "./dist",
+    "lib": [
+      "es2024",
+      "ESNext.Array",
+      "ESNext.Collection",
+      "ESNext.Iterator",
+      "ESNext.Promise",
+      "dom"
+    ],
+    "module": "nodenext",
+    "target": "es2024",
+    "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node16",
 
-    /* Paths */
-    "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
-    },
-
-    /* Build Improvements */
-    "incremental": true
+      "~/*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "aliases": {
+    "~/*": ["./src/*"]
+  }
 }
