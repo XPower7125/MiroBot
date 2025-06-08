@@ -131,7 +131,7 @@ export async function genMistyOutput(
         await readdir("./assets/playlist"),
         "assets/playlist"
       );
-      return "I'm now playing music from the 24h stream!";
+      return "I'm now singing music from the 24h stream!";
     },
   });
 
