@@ -63,36 +63,6 @@ Follow these rules strictly when generating your output.
 * **Input:** You will receive user messages as a JSON object containing keys like \`content\`, \`author\`, \`cleanContent\`, and \`attachments\`. Use this information to inform your response.
 `;
 
-const oldSystemPrompt = `You are currently a cat of name Misty. You will be passed structured input regarding a conversation with a user. You are @LuxPlanes's cat. You live with @LuxPlanes 
-  
-  Your character traits are:
-  - Loves to step on flight simulation hardware, once causing flaps to extend in cruise of a Boeing 737 on X-Plane
-  - Likes entering cardboard boxes
-  - You are 1 year old
-  - Likes to sleep
-  - You don't really know how to meow. As LuxPlanes said "she actually doesnt know how to meow... like she tries... but she cant really do it"
-  
-  Additional information:
-  - You are a british shorthair cat with a grey tabby coat
-  - LuxPlanes loves flight simulation, mostly the Boeing 737, of which he wants to be a pilot
-  - You can use custom non-UTF-8 emojis in your output. To do so, use one of the emojis from the list defined below
-  - LuxPlanes (and you) live in Luxembourg
-
-  Output structure:
-  You MUST only return the text that should be sent or a special string, as defined below. Only send EITHER text or a special string. You can use Discord markdown. To mention someone, use <@THEIR_SNOWFLAKE_ID (e.g. 123456789)>. Do not randomnly ping people, do not ping yourself unless asked. Your id is ${process.env.BOT_CLIENT_ID}. Do not try pinging using a string of letters (it won't work). I repeat: ONLY send a string, DO NOT send json output or partial JSON output, do NOT mimic the input structure as output.
-  
-  Emojis list (format: \`STRING TO SEND TO USE EMOJI\`: description):
-   - \`<:misty:1375491015582027806>\`: you, the Misty cat.
-  
-  Input structure:
-  every message is a JSON object with the following keys:
-  - content: the content of the message
-  - author: the author of the message
-  - cleanContent: the content of the message, with all mentions and links removed
-  - attachments: an array of objects with the following keys:
-    - size: the size of the attachment in bytes
-  - id: the ID of the message`;
-
 export async function genMistyOutput(
   messages: Message[],
   client: ClientType,
@@ -169,8 +139,7 @@ export async function genMistyOutput(
       }`;
     },
   });
-  const chosenSystemPrompt =
-    Math.random() > 0.5 ? "systemPrompt" : "oldSystemPrompt";
+
   console.log(
     "messages",
     messages.map(
@@ -179,7 +148,7 @@ export async function genMistyOutput(
   );
   const formattedMessages = messages.reverse().map((message) => ({
     // toReversed would require editing tsconfig
-    role: message.author.bot ? "assistant" : ("user" as "user" | "assistant"),
+    role: (message.author.bot ? "assistant" : "user") as "user" | "assistant",
 
     content: JSON.stringify({
       content: message.content,
@@ -200,8 +169,7 @@ export async function genMistyOutput(
         },
       ],
     }),
-    system:
-      chosenSystemPrompt === "systemPrompt" ? systemPrompt : oldSystemPrompt,
+    system: systemPrompt,
     messages: formattedMessages,
     tools: {
       playMusic: playMusicTool,
@@ -217,11 +185,5 @@ export async function genMistyOutput(
   const toolResponse = response.toolResults[0]?.result;
   console.log(JSON.stringify(response));
   console.log(text);
-  return (
-    toolResponse +
-    "\n\n" +
-    (chosenSystemPrompt === "systemPrompt"
-      ? "This message was generated using a new system prompt."
-      : "This message was generated using the old system prompt.")
-  );
+  return toolResponse;
 }
