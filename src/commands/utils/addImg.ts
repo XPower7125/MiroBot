@@ -88,7 +88,7 @@ export default {
       owner: "StarNumber12046",
       repo: "starnumber12046.github.io",
       baseBranch: "main",
-      filePath: "src/pages/misty.ts",
+      filePath: "src/urls.ts",
       editFn: appendUrlsToRedirectArray(
         attachmentUrls.filter((url) => url != undefined)
       ),
