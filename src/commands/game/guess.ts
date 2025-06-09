@@ -87,7 +87,7 @@ export default {
     if (!interaction.channel || interaction.channel.type === ChannelType.DM)
       return await interaction.followUp("This cannot be used in DMs");
     const thread = await message.startThread({
-      name: `Guess the aircraft - ${registration}`,
+      name: `Guess the aircraft`,
       autoArchiveDuration: 60,
       reason: "Guess the aircraft game",
     });
