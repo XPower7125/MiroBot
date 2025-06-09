@@ -56,7 +56,6 @@ async function findRandomAircraft(): Promise<Aircraft | null> {
   console.log(flights.length);
   const randomFlight = flights[Math.floor(Math.random() * flights.length)];
   const flightDetails = await frApi.getFlightDetails(randomFlight);
-  console.log(flightDetails);
   const aircraftImage = getAircraftImage(
     (flightDetails as { aircraft: AircraftData }).aircraft
   );
