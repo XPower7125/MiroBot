@@ -2,6 +2,7 @@ import type { AudioPlayer, AudioResource } from "@discordjs/voice";
 import {
   Client,
   Collection,
+  Message,
   SlashCommandBuilder,
   type Interaction,
 } from "discord.js";
@@ -13,11 +14,19 @@ export interface CommandType {
   execute: (interaction: Interaction) => void;
 }
 
+export interface GuessGame {
+  imageUrl: string;
+  registration: string;
+  guesses: Message[];
+  icaoCode: string;
+}
+
 export type ClientType = Client<boolean> & {
   commands: Collection<string, CommandType>;
   events: Collection<string, EventType>;
   players: Collection<string, AudioPlayer>;
   audioResources: Collection<string, AudioResource>;
+  guessGames: Collection<string, GuessGame>;
 };
 
 export interface EventType {

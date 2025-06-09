@@ -32,6 +32,24 @@ async function recursivelyFetchMessage(
   return messages;
 }
 
+async function handleAircraftGuess(message: Message, client: ClientType) {
+  const guessGame = client.guessGames.get(message.channel.id ?? "");
+  console.log(guessGame);
+  if (!guessGame) return;
+  const guess = message.content.trim();
+  console.log(guess);
+  if (guess.length === 0) return;
+  guessGame.guesses.push(message);
+  if (guess.toUpperCase() === guessGame.icaoCode.toUpperCase()) {
+    await message.reply(
+      `<@${message.author.id}> guessed the aircraft after ${guessGame.guesses.length} guesses!\n-# By the way, the registration was ${guessGame.registration}`
+    );
+    client.guessGames.delete(message.channel.id);
+    return;
+  }
+  await message.reply("Nope!");
+}
+
 export default {
   eventType: "messageCreate",
   async execute(
@@ -39,6 +57,14 @@ export default {
     message: OmitPartialGroupDMChannel<Message<boolean>>
   ) {
     if (message.author.bot) return;
+    if (
+      client.guessGames.has(message.channel.id) &&
+      !message.content.includes(client.user?.id ?? "")
+    ) {
+      handleAircraftGuess(message, client);
+      return;
+    }
+
     const completeMessageReference = message.reference?.messageId
       ? await message.channel.messages.fetch(message.reference?.messageId)
       : null;
