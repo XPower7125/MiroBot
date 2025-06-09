@@ -19,6 +19,7 @@ export interface GuessGame {
   registration: string;
   guesses: Message[];
   icaoCode: string;
+  originalMessage: Message;
 }
 
 export type ClientType = Client<boolean> & {

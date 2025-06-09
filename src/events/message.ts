@@ -41,10 +41,11 @@ async function handleAircraftGuess(message: Message, client: ClientType) {
   if (guess.length === 0) return;
   guessGame.guesses.push(message);
   if (guess.toUpperCase() === guessGame.icaoCode.toUpperCase()) {
-    await message.reply(
-      `<@${message.author.id}> guessed the aircraft after ${guessGame.guesses.length} guesses!\n-# By the way, the registration was ${guessGame.registration}`
+    await guessGame.originalMessage.reply(
+      `<@${message.author.id}> guessed the aircraft after ${guessGame.guesses.length} guesses!\nThe aircraft was ${guessGame.icaoCode}\n-# By the way, the registration was ${guessGame.registration}`
     );
     client.guessGames.delete(message.channel.id);
+    await message.channel.delete();
     return;
   }
   await message.reply("Nope!");

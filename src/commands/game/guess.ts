@@ -97,6 +97,7 @@ export default {
       imageUrl,
       registration,
       guesses: [],
+      originalMessage: message,
       icaoCode: icao,
     });
   },
