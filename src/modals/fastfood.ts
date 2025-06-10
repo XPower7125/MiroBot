@@ -8,7 +8,7 @@ export default {
   async execute(client: ClientType, interaction: ModalSubmitInteraction) {
     console.log(interaction);
     const { fields } = interaction;
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
     const message = client.modalsMessageState.get(
       `fastfood-${interaction.channelId}-${interaction.user.id}`
     );
