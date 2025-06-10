@@ -1,6 +1,6 @@
 import type { ModalSubmitInteraction } from "discord.js";
-import { db } from "~/db/index.js";
-import { fastfoodTable } from "~/db/schema.js";
+import { db } from "../db/index.js";
+import { fastfoodTable } from "../db/schema.js";
 import type { ClientType } from "~/types.js";
 
 export default {
