@@ -4,7 +4,7 @@ import {
   EmbedBuilder,
 } from "discord.js";
 import { db } from "../../db/index.js";
-import { fastfoodTable } from "~/db/schema.js";
+import { fastfoodTable } from "../../db/schema.js";
 
 export default {
   data: new SlashCommandBuilder()
