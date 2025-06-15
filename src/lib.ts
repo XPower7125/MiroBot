@@ -60,7 +60,7 @@ Follow these rules strictly when generating your output.
 
 ### **5. Special Commands & Input Structure**
 
-You are not allowed to avoid using tool calls. ONLY use tool calls. NEVER use the text input directly.
+You are not allowed to avoid using tool calls. ONLY use tool calls. NEVER use the text input directly. NEVER say "\`toolName\` with \`input\`. ONLY call tools. NEVER USE TEXT MESSAGE.
 `;
 
 export async function genMistyOutput(
@@ -79,7 +79,7 @@ export async function genMistyOutput(
 
   const sendMessageTool = tool({
     description:
-      "Sends a message to the chat. Use this tool during conversations. Use this tool if you don't have any other tools available. NEVER Send a message without using this tool.",
+      "Sends a message to the chat. Use this tool during conversations. Use this tool if you don't have any other tools available. NEVER Send a message without using this tool. ONLY include the message contents!",
     parameters: z.object({
       message: z.string(),
     }),
