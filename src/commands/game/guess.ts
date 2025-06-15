@@ -1,9 +1,13 @@
 import {
+  AutocompleteInteraction,
   ChannelType,
   ChatInputCommandInteraction,
+  MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
 import { FlightRadar24API } from "flightradarapi";
+import { readdir, readFile } from "node:fs/promises";
+import { env } from "node:process";
 import type { ClientType } from "~/types.js";
 
 interface Aircraft {
@@ -69,9 +73,77 @@ async function findRandomAircraft(): Promise<Aircraft | null> {
 export default {
   data: new SlashCommandBuilder()
     .setName("guess")
-    .setDescription('Starts a game of "guess the aircraft"'),
+    .setDescription('Starts a game of "guess the aircraft"')
+    .addStringOption((option) =>
+      option
+        .setName("dataset")
+        .setDescription(
+          "Optional dataset to use instead of the default flightradar24 dataset"
+        )
+        .setRequired(false)
+        .setAutocomplete(true)
+    ),
   async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
+    const dataset = interaction.options.getString("dataset");
+    if (dataset) {
+      const datasets = await readdir(env.DATASETS_PATH ?? "");
+      if (!datasets.includes(dataset)) {
+        await interaction.followUp({
+          content: "Invalid dataset",
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+      const datasetAircraft = await readdir(env.DATASETS_PATH + "/" + dataset);
+      // Pick a random aircraft from the dataset
+      const aircraftRandomIndex = Math.floor(
+        Math.random() * datasetAircraft.length
+      );
+      const aircraft = datasetAircraft[aircraftRandomIndex];
+      // For that aircraft, get a random registration
+      const registrations = await readdir(
+        env.DATASETS_PATH + "/" + dataset + "/" + aircraft
+      );
+      const registrationRandomIndex = Math.floor(
+        Math.random() * registrations.length
+      );
+      const registration = registrations[registrationRandomIndex].replace(
+        ".jpg",
+        ""
+      );
+      // Get the image for that aircraft
+      const image = await readFile(
+        env.DATASETS_PATH +
+          "/" +
+          dataset +
+          "/" +
+          aircraft +
+          "/" +
+          registration +
+          ".jpg"
+      );
+      const message = await interaction.followUp({
+        files: [image],
+        content: `## Guess the aircraft!\n<@${interaction.user.id}> has started a game of "guess the aircraft"`,
+      });
+      const thread = await message.startThread({
+        name: `Guess the aircraft`,
+        autoArchiveDuration: 60,
+        reason: "Guess the aircraft game",
+      });
+      await thread.send(
+        `Send here your guesses! Remember, you have to send the exact ICAO code!`
+      );
+      (interaction.client as ClientType).guessGames.set(thread.id, {
+        imageUrl: "attachment://" + registration + ".jpg",
+        registration,
+        guesses: [],
+        originalMessage: message,
+        icaoCode: aircraft,
+      });
+      return;
+    }
     const aircraft = await findRandomAircraft();
     if (!aircraft) {
       await interaction.followUp("No aircraft found!");
@@ -100,5 +172,13 @@ export default {
       originalMessage: message,
       icaoCode: icao,
     });
+  },
+  async autocomplete(interaction: AutocompleteInteraction) {
+    const focusedValue = interaction.options.getFocused();
+    const datasets = await readdir(env.DATASETS_PATH ?? "");
+    const filtered = datasets.filter((choice) => choice.includes(focusedValue));
+    await interaction.respond(
+      filtered.map((choice) => ({ name: choice, value: choice }))
+    );
   },
 };
