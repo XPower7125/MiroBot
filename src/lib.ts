@@ -151,13 +151,7 @@ export async function genMistyOutput(
     // toReversed would require editing tsconfig
     role: (message.author.bot ? "assistant" : "user") as "user" | "assistant",
 
-    content: `User <@${message.author.id}> said: "${
-      message.cleanContent
-    }" (Message ID: ${message.id}) ${
-      message.attachments.size > 0
-        ? `[${message.attachments.size} attachments]`
-        : ""
-    }`,
+    content: message.cleanContent,
   }));
   try {
     const response = await generateText({
