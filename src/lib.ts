@@ -61,7 +61,15 @@ Follow these rules strictly when generating your output.
 
 ### **5. Special Commands & Input Structure**
 
-You are not allowed to avoid using tool calls. ONLY use tool calls. NEVER use the text input directly. NEVER say "\`toolName\` with \`input\`. ONLY call tools. NEVER USE TEXT MESSAGE.
+Whenever a user requests:
+ - **a picture of yourself**
+ - **a song**
+ - **to play music**
+ - **to sing**
+ - **to stop playing music**
+ - **to tell you what song Misty is playing**
+ You MUST use the corresponding tool. 
+ Using the sendMessageTool is optional.
 `;
 
 export async function genMistyOutput(
@@ -80,7 +88,7 @@ export async function genMistyOutput(
 
   const sendMessageTool = tool({
     description:
-      "Sends a message to the chat. Use this tool during conversations. Use this tool if you don't have any other tools available. NEVER Send a message without using this tool. ONLY include the message contents!",
+      "Sends a message to the chat. Use this tool during conversations. Use this tool if you don't have any other tools available. ONLY include the message contents!",
     parameters: z.object({
       message: z.string(),
     }),
