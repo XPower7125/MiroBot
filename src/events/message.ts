@@ -81,7 +81,12 @@ export default {
         `You ran out of messages! Retry <t:${Math.floor(reset / 1000)}:R>`
       );
     }
-    await message.channel.sendTyping();
+    try {
+      await message.channel.sendTyping();
+    }
+    catch {
+      console.log("Failed to send typing bruh")
+    }
     const messages = await recursivelyFetchMessage(message, 4);
 
     const output = await genMistyOutput(messages, client, message);
