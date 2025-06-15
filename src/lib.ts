@@ -60,7 +60,7 @@ Follow these rules strictly when generating your output.
 
 ### **5. Special Commands & Input Structure**
 
-* **Input:** You will receive user messages as a JSON object containing keys like \`content\`, \`author\`, \`cleanContent\`, and \`attachments\`. Use this information to inform your response.
+You are not allowed to avoid using tool calls. ONLY use tool calls. NEVER use the text input directly.
 `;
 
 export async function genMistyOutput(
@@ -79,7 +79,7 @@ export async function genMistyOutput(
 
   const sendMessageTool = tool({
     description:
-      "Sends a message to the chat. Use this tool during conversations.",
+      "Sends a message to the chat. Use this tool during conversations. Use this tool if you don't have any other tools available. NEVER Send a message without using this tool.",
     parameters: z.object({
       message: z.string(),
     }),
@@ -150,40 +150,39 @@ export async function genMistyOutput(
     // toReversed would require editing tsconfig
     role: (message.author.bot ? "assistant" : "user") as "user" | "assistant",
 
-    content: JSON.stringify({
-      content: message.content,
-      author: message.author,
-      cleanContent: message.cleanContent,
-      attachments: message.attachments.map((attachment) => ({
-        size: attachment.size,
-      })),
-      id: message.id,
-    }),
+    content: `User <@${message.author.id}> said: "${
+      message.cleanContent
+    }" (Message ID: ${message.id}) ${
+      message.attachments.size > 0
+        ? `[${message.attachments.size} attachments]`
+        : ""
+    }`,
   }));
-  const response = await generateText({
-    model: google("gemini-2.0-flash-lite", {
-      safetySettings: [
-        {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_LOW_AND_ABOVE",
-        },
-      ],
-    }),
-    system: systemPrompt,
-    messages: formattedMessages,
-    tools: {
-      playMusic: playMusicTool,
-      myself: myselfTool,
-      sendMessage: sendMessageTool,
-      stopPlaying: stopPlayingTool,
-      whatSong: whatSongTool,
-    },
-    toolChoice: "required",
-  });
+  try {
+    const response = await generateText({
+      model: google("gemini-2.0-flash-lite"),
+      system: systemPrompt,
+      messages: formattedMessages,
+      tools: {
+        playMusic: playMusicTool,
+        myself: myselfTool,
+        sendMessage: sendMessageTool,
+        stopPlaying: stopPlayingTool,
+        whatSong: whatSongTool,
+      },
+    });
 
-  const text = response.text;
-  const toolResponse = response.toolResults[0]?.result;
-  console.log(JSON.stringify(response));
-  console.log(text);
-  return toolResponse;
+    const text = response.text;
+    const toolResponse = response.toolResults[0]?.result;
+    if (!toolResponse) {
+      return text;
+    }
+    console.log(JSON.stringify(response));
+    console.log(text);
+    return toolResponse;
+  } catch (error) {
+    console.log(error);
+    console.log(JSON.stringify(error));
+    // return "I'm sorry, I don't know what to say. Please try again later.";
+  }
 }
