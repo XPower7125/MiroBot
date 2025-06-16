@@ -1,4 +1,5 @@
 import {
+  AutocompleteInteraction,
   ChannelType,
   ChatInputCommandInteraction,
   GuildMember,
@@ -7,10 +8,18 @@ import {
 } from "discord.js";
 import { playAudioPlaylist } from "../../utils/voice.js";
 import { readdir } from "fs/promises";
+import NodeID3 from "node-id3";
 export default {
   data: new SlashCommandBuilder()
     .setName("play")
     .setDescription("Plays the music from the 24 hour stream")
+    .addStringOption((option) =>
+      option
+        .setDescription("The song to play first")
+        .setName("song")
+        .setAutocomplete(true)
+        .setRequired(false)
+    )
     .addChannelOption((option) =>
       option
         .addChannelTypes(ChannelType.GuildVoice)
@@ -38,13 +47,44 @@ export default {
       await interaction.followUp("That's not a valid voice channel!");
       return;
     }
+    const startingSong = interaction.options.getString("song");
     await interaction.followUp(`Playing music on <#${channel.id}>!`);
-    playAudioPlaylist(
-      channel as VoiceChannel,
-      await readdir("./assets/playlist"),
-      "assets/playlist"
-    );
+    if (startingSong) {
+      console.log("starting song: ", startingSong);
+      playAudioPlaylist(
+        channel as VoiceChannel,
+        await readdir("./assets/playlist"),
+        "assets/playlist",
+        startingSong
+      );
+    } else {
+      playAudioPlaylist(
+        channel as VoiceChannel,
+        await readdir("./assets/playlist"),
+        "assets/playlist"
+      );
+    }
 
     console.log("Audio played successfully!");
+  },
+
+  async autocomplete(interaction: AutocompleteInteraction) {
+    const songs = (await readdir("assets/playlist")).map((item) => {
+      return {
+        fileName: item,
+        name: NodeID3.read("assets/playlist/" + item).title,
+      };
+    });
+    const filtered = songs.filter((choice) =>
+      (choice.name ?? choice.fileName)
+        .toLowerCase()
+        .includes(interaction.options.getFocused().toLowerCase())
+    );
+    await interaction.respond(
+      filtered.map((choice) => ({
+        name: choice.name ?? choice.fileName,
+        value: choice.fileName,
+      }))
+    );
   },
 };

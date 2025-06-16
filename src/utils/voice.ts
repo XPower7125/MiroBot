@@ -61,7 +61,8 @@ export async function playAudio(channel: VoiceChannel, filename: string) {
 export async function playAudioPlaylist(
   channel: VoiceChannel,
   filenames: string[],
-  playlistPath: string
+  playlistPath: string,
+  startingSong?: string
 ) {
   if (filenames.length === 0) return;
 
@@ -117,7 +118,25 @@ export async function playAudioPlaylist(
   });
 
   // Start playing the first song
-  playRandomSong();
+  if (startingSong) {
+    const filename = startingSong;
+    const filePath = join(process.cwd(), playlistPath, filename ?? "");
+    console.log(`Playing ${filename}`);
+    console.log(filePath);
+    const resource = createAudioResource(filePath, {
+      inputType: StreamType.Arbitrary,
+      metadata: {
+        filename: filePath,
+      },
+    });
+    (channel.client as ClientType).audioResources.set(
+      channel.guild.id,
+      resource
+    );
+    player.play(resource);
+  } else {
+    playRandomSong();
+  }
 
   return player; // Return player so you can control it externally if needed
 }
