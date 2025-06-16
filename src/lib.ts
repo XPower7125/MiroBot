@@ -1,5 +1,11 @@
 import { google } from "@ai-sdk/google";
-import { generateText, tool } from "ai";
+import {
+  generateText,
+  tool,
+  type FilePart,
+  type ImagePart,
+  type TextPart,
+} from "ai";
 import { VoiceChannel, type Message } from "discord.js";
 import z from "zod";
 import type { ClientType } from "./types.js";
@@ -79,6 +85,55 @@ Whenever a user requests:
  You MUST use the corresponding tool. 
  Using the sendMessageTool is optional.
 `;
+
+function getMessageContentOrParts(message: Message) {
+  if (message.author.bot) {
+    return {
+      content: JSON.stringify({
+        content: message.content,
+        author: message.author,
+        cleanContent: message.cleanContent,
+        attachments: message.attachments.map((attachment) => ({
+          size: attachment.size,
+        })),
+        id: message.id,
+      }),
+      role: "assistant" as const,
+    };
+  }
+  return {
+    role: "user" as const,
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify({
+          content: message.content,
+          author: message.author,
+          cleanContent: message.cleanContent,
+          attachments: message.attachments.map((attachment) => ({
+            size: attachment.size,
+          })),
+          id: message.id,
+        }),
+      } as TextPart,
+      ...(message.attachments.map((attachment) => {
+        const isImage = attachment.contentType?.startsWith("image");
+        if (isImage) {
+          return {
+            type: isImage ? "image" : "file",
+            image: attachment.url,
+            mimeType: attachment.contentType,
+          };
+        }
+        return {
+          type: isImage ? "image" : "file",
+          data: attachment.url,
+          mimeType: attachment.contentType,
+        };
+      }) as (ImagePart | FilePart)[]),
+    ],
+  };
+}
 
 export async function genMistyOutput(
   messages: Message[],
@@ -163,29 +218,27 @@ export async function genMistyOutput(
       (message) => message.author.displayName + " - " + message.content
     )
   );
-  const formattedMessages = messages.reverse().map((message) => ({
-    // toReversed would require editing tsconfig
-    role: (message.author.bot ? "assistant" : "user") as "user" | "assistant",
-
-    content: JSON.stringify({
-      content: message.content,
-
-      author: message.author,
-
-      cleanContent: message.cleanContent,
-
-      attachments: message.attachments.map((attachment) => ({
-        size: attachment.size,
-      })),
-
-      id: message.id,
-    }),
-  }));
   try {
+    console.log(
+      messages.map((message) =>
+        message.attachments.map(
+          (attachment) =>
+            attachment.url +
+            ", " +
+            attachment.name +
+            ", " +
+            attachment.contentType +
+            ", " +
+            attachment.size
+        )
+      )
+    );
     const response = await generateText({
       model: google("gemini-2.0-flash-lite"),
       system: systemPrompt,
-      messages: formattedMessages,
+      messages: messages
+        .reverse()
+        .map((message) => getMessageContentOrParts(message)),
       tools: {
         playMusic: playMusicTool,
         myself: myselfTool,
