@@ -1,6 +1,6 @@
 import { channel } from "diagnostics_channel";
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { posthogClient, eventTypes } from "~/analytics.js";
+import { posthogClient, eventTypes } from "../../analytics.js";
 import type { ClientType } from "~/types.js";
 export default {
   data: new SlashCommandBuilder()

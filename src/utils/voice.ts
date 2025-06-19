@@ -8,7 +8,7 @@ import {
 } from "@discordjs/voice";
 import { join } from "path";
 import type { ClientType } from "~/types.js";
-import { posthogClient, eventTypes } from "~/analytics.js";
+import { posthogClient, eventTypes } from "../analytics.js";
 
 /**
  * Gets all voice channels in a guild
