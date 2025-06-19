@@ -55,13 +55,15 @@ export default {
         channel as VoiceChannel,
         await readdir("./assets/playlist"),
         "assets/playlist",
+        interaction.user,
         startingSong
       );
     } else {
       playAudioPlaylist(
         channel as VoiceChannel,
         await readdir("./assets/playlist"),
-        "assets/playlist"
+        "assets/playlist",
+        interaction.user
       );
     }
 

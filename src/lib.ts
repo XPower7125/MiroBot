@@ -13,6 +13,7 @@ import { readdir } from "fs/promises";
 import { playAudioPlaylist } from "./utils/voice.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import NodeID3 from "node-id3";
+import { posthogClient, eventTypes } from "./analytics.js";
 
 const systemPrompt = `Here is the revised prompt, designed to be more structured and effective.
 
@@ -171,7 +172,8 @@ export async function genMistyOutput(
       await playAudioPlaylist(
         latestMessage.member.voice.channel as VoiceChannel,
         await readdir("./assets/playlist"),
-        "assets/playlist"
+        "assets/playlist",
+        latestMessage.member.user
       );
       return "I'm now singing music from the 24h stream!";
     },
@@ -218,6 +220,19 @@ export async function genMistyOutput(
       (message) => message.author.displayName + " - " + message.content
     )
   );
+  posthogClient.capture({
+    event: eventTypes.aiMessage,
+    distinctId: latestMessage.author.id,
+    properties: {
+      $set: {
+        name: latestMessage.author.username,
+        displayName: latestMessage.author.displayName,
+        avatar: latestMessage.author.avatarURL(),
+        userId: latestMessage.author.id,
+      },
+      message: latestMessage.cleanContent,
+    },
+  });
   try {
     console.log(
       messages.map((message) =>

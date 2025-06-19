@@ -12,6 +12,7 @@ import dotenv from "dotenv";
 import type { ClientType, EventType, CommandType, ModalType } from "./types.js";
 import { fileURLToPath } from "url";
 import { getVoiceChannels, hasMembers, playAudio } from "./utils/voice.js";
+import { eventTypes, posthogClient } from "./analytics.js";
 
 console.log("Starting up Misty");
 
@@ -94,6 +95,13 @@ async function playMeowOnGuilds() {
           console.log("Meowing on guard!");
         }
         if (randomValue < 0.25 || channel.name === "121.5") {
+          posthogClient.capture({
+            event: eventTypes.meow,
+            distinctId: channel.id,
+            properties: {
+              channel: channel.name,
+            },
+          });
           await playAudio(channel, "assets/meow.mp3");
           console.log("Meowed successfully!");
         }
@@ -118,7 +126,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
       );
       return;
     }
-
+    posthogClient.capture({
+      event: eventTypes.commandExecute,
+      distinctId: interaction.user.id,
+      properties: {
+        command: interaction.commandName,
+        $set: {
+          name: interaction.user.username,
+          displayName: interaction.user.displayName,
+          avatar: interaction.user.avatarURL(),
+          userId: interaction.user.id,
+        },
+      },
+    });
     try {
       await command.execute(interaction);
     } catch (error) {
@@ -135,6 +155,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
             flags: MessageFlags.Ephemeral,
           });
         } catch (error) {
+          posthogClient.capture({
+            event: eventTypes.interactionError,
+            distinctId: interaction.user.id,
+            properties: {
+              type: "command",
+              error: (error as Error).message,
+              $set: {
+                name: interaction.user.username,
+                displayName: interaction.user.displayName,
+                avatar: interaction.user.avatarURL(),
+                userId: interaction.user.id,
+              },
+            },
+          });
           console.error(error);
         }
       }
@@ -149,7 +183,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
       );
       return;
     }
-
+    posthogClient.capture({
+      event: eventTypes.commandExecute,
+      distinctId: interaction.user.id,
+      properties: {
+        command: interaction.commandName,
+        $set: {
+          name: interaction.user.username,
+          displayName: interaction.user.displayName,
+          avatar: interaction.user.avatarURL(),
+          userId: interaction.user.id,
+        },
+      },
+    });
     try {
       await command.execute(interaction);
     } catch (error) {
@@ -184,6 +230,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
     try {
       await command.autocomplete(interaction);
     } catch (error) {
+      posthogClient.capture({
+        event: eventTypes.interactionError,
+        distinctId: interaction.user.id,
+        properties: {
+          type: "contextMenu",
+          error: (error as Error).message,
+          $set: {
+            name: interaction.user.username,
+            displayName: interaction.user.displayName,
+            avatar: interaction.user.avatarURL(),
+            userId: interaction.user.id,
+          },
+        },
+      });
       console.error(error);
     }
   }
@@ -195,7 +255,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
       console.error(`No modal matching ${interaction.customId} was found.`);
       return;
     }
-
+    posthogClient.capture({
+      event: eventTypes.modalOpen,
+      distinctId: interaction.user.id,
+      properties: {
+        modalId: interaction.customId,
+        $set: {
+          name: interaction.user.username,
+          displayName: interaction.user.displayName,
+          avatar: interaction.user.avatarURL(),
+          userId: interaction.user.id,
+        },
+      },
+    });
     try {
       modalModule.execute(client, interaction);
     } catch (error) {
@@ -212,6 +284,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
             flags: MessageFlags.Ephemeral,
           });
         } catch (error) {
+          posthogClient.capture({
+            event: eventTypes.interactionError,
+            distinctId: interaction.user.id,
+            properties: {
+              type: "modal",
+              error: (error as Error).message,
+              $set: {
+                name: interaction.user.username,
+                displayName: interaction.user.displayName,
+                avatar: interaction.user.avatarURL(),
+                userId: interaction.user.id,
+              },
+            },
+          });
           console.error(error);
         }
       }
