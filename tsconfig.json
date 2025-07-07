@@ -14,7 +14,6 @@
     ],
     "module": "nodenext",
     "target": "es2024",
-    "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true,
     "strict": true,
     "esModuleInterop": true,

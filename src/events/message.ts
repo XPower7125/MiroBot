@@ -27,7 +27,6 @@ async function recursivelyFetchMessage(
     currentMessage = nextMessage;
     count++;
   }
-  console.log(messages);
 
   return messages;
 }
@@ -87,7 +86,7 @@ export default {
     catch {
       console.log("Failed to send typing bruh")
     }
-    const messages = await recursivelyFetchMessage(message, 4);
+    const messages = await recursivelyFetchMessage(message, 10);
 
     const output = await genMistyOutput(messages, client, message);
     console.log(output);
@@ -118,7 +117,6 @@ export default {
         return;
       }
     }
-    console.log("OUTPUT", output);
     await message.reply(output);
   },
 };

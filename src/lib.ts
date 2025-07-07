@@ -15,10 +15,7 @@ import { getVoiceConnection } from "@discordjs/voice";
 import NodeID3 from "node-id3";
 import { posthogClient, eventTypes } from "./analytics.js";
 
-const systemPrompt = `Here is the revised prompt, designed to be more structured and effective.
-
-***
-
+const systemPrompt = `
 ### **1. Core Persona: Who You Are**
 
 You are **Misty**, a 1-year-old female British Shorthair cat with a grey tabby coat. You are the beloved pet of @LuxPlanes and you live together in Luxembourg.
@@ -143,21 +140,26 @@ export async function genMistyOutput(
 ) {
   const myselfTool = tool({
     description:
-      'Used to send a picture of yourself to the chat. Only use this when the most recent output is asking for your appearance (e.g. "what do you look like?" or "send me a picture of yourself")',
-    parameters: z.object({}),
-    execute: async () => {
-      return `{{MYSELF}}`;
+      'Used to send a picture of yourself to the chat. Only use this when the most recent output is asking for your appearance (e.g. "what do you look like?" or "send me a picture of yourself").  You MUST classify messages as general (for random questions), fun (e.g. jokes / memes), roleplay (e.g. roleplaying, pettting, cuddling etc.), music (e.g. playing music), or other (e.g. other questions) and score your classification on a scale of how likely that is the case. The score should be a number between 0 and 1. If you don\'t know what to do, score it as 0.5.',
+    parameters: z.object({
+      messageClassification: z.enum(["general", "fun", "roleplay", "music", "other"]),
+      classificationScoring: z.number().min(0).max(1),
+    }),
+    execute: async ({messageClassification, classificationScoring}) => {
+      return {message: `{{MYSELF}}`, messageClassification, classificationScoring};
     },
   });
 
   const sendMessageTool = tool({
     description:
-      "Sends a message to the chat. Use this tool during conversations. Use this tool if you don't have any other tools available. ONLY include the message contents!",
+      "Sends a message to the chat. Use this tool during conversations. Use this tool if you don't have any other tools available. ONLY include the message contents! You MUST classify messages as general (for random questions), fun (e.g. jokes / memes), roleplay (e.g. roleplaying, pettting, cuddling etc.), music (e.g. playing music), or other (e.g. other questions) and score your classification on a scale of how likely that is the case. The score should be a number between 0 and 1. If you don't know what to do, score it as 0.5.",
     parameters: z.object({
       message: z.string(),
+      messageClassification: z.enum(["general", "fun", "roleplay", "music", "other"]),
+      classificationScoring: z.number().min(0).max(1),
     }),
-    execute: async ({ message }) => {
-      return message;
+    execute: async ({ message, messageClassification, classificationScoring }) => {
+      return {message, messageClassification, classificationScoring};
     },
   });
 
@@ -167,7 +169,7 @@ export async function genMistyOutput(
     parameters: z.object({}),
     execute: async () => {
       if (!latestMessage.member?.voice?.channel) {
-        return "I don't know where to sing!";
+        return {message: "I don't know where to sing!", messageClassification: "music", classificationScoring: 1};
       }
       await playAudioPlaylist(
         latestMessage.member.voice.channel as VoiceChannel,
@@ -175,7 +177,7 @@ export async function genMistyOutput(
         "assets/playlist",
         latestMessage.member.user
       );
-      return "I'm now singing music from the 24h stream!";
+      return {message: "I'm now singing music from the 24h stream!", messageClassification: "music", classificationScoring: 1};
     },
   });
 
@@ -186,11 +188,11 @@ export async function genMistyOutput(
     execute: async () => {
       const connection = getVoiceConnection(latestMessage.guildId ?? "");
       if (!connection) {
-        return "I'm not singing!";
+        return {message: "I'm not singing!", messageClassification: "music", classificationScoring: 1};
       }
       client.players.delete(latestMessage.guildId ?? "");
       connection.destroy();
-      return "I'm no longer singing!";
+      return {message: "I'm no longer singing!", messageClassification: "music", classificationScoring: 1};
     },
   });
 
@@ -202,15 +204,15 @@ export async function genMistyOutput(
       const resource = client.audioResources.get(latestMessage.guildId ?? "");
 
       if (!resource) {
-        return "I'm not singing!";
+        return {message: "I'm not singing!", messageClassification: "music", classificationScoring: 1};
       }
 
       const filename = (resource.metadata as { filename: string })
         ?.filename as string;
       const resourceTags = NodeID3.read(filename);
-      return `I'm currently playing ${resourceTags.title ?? "Unknown"} by ${
+      return {message: `I'm currently playing ${resourceTags.title ?? "Unknown"} by ${
         resourceTags.artist ?? "Unknown"
-      }`;
+      }`, messageClassification: "music", classificationScoring: 1};
     },
   });
 
@@ -220,19 +222,7 @@ export async function genMistyOutput(
       (message) => message.author.displayName + " - " + message.content
     )
   );
-  posthogClient.capture({
-    event: eventTypes.aiMessage,
-    distinctId: latestMessage.author.id,
-    properties: {
-      $set: {
-        name: latestMessage.author.username,
-        displayName: latestMessage.author.displayName,
-        avatar: latestMessage.author.avatarURL(),
-        userId: latestMessage.author.id,
-      },
-      message: latestMessage.cleanContent,
-    },
-  });
+  
   try {
     console.log(
       messages.map((message) =>
@@ -261,16 +251,53 @@ export async function genMistyOutput(
         stopPlaying: stopPlayingTool,
         whatSong: whatSongTool,
       },
+      toolChoice: "required"
+      
     });
 
     const text = response.text;
     const toolResponse = response.toolResults[0]?.result;
     if (!toolResponse) {
+      posthogClient.capture({
+        event: eventTypes.aiMessage,
+        distinctId: latestMessage.author.id,
+        properties: {
+          $set: {
+            name: latestMessage.author.username,
+            displayName: latestMessage.author.displayName,
+            avatar: latestMessage.author.avatarURL(),
+            userId: latestMessage.author.id,
+          },
+          message: latestMessage.cleanContent,
+          response: text,
+          messageClassification: "general",
+          classificationScoring: 0.5,
+        },
+      });
       return text;
     }
+    const { message, messageClassification, classificationScoring } = toolResponse;
     console.log(JSON.stringify(response));
     console.log(text);
-    return toolResponse;
+    posthogClient.capture({
+      event: eventTypes.aiMessage,
+      distinctId: latestMessage.author.id,
+      properties: {
+        $set: {
+          name: latestMessage.author.username,
+          displayName: latestMessage.author.displayName,
+          avatar: latestMessage.author.avatarURL(),
+          userId: latestMessage.author.id,
+        },
+        message: latestMessage.cleanContent,
+        response: message,
+        messageClassification: messageClassification,
+        classificationScoring: classificationScoring,
+      },
+    });
+    console.log("Score: " + classificationScoring);
+    console.log("Classification: " + messageClassification);
+    return message;
   } catch (error) {
     console.log(error);
     console.log(JSON.stringify(error));
