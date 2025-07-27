@@ -56,7 +56,7 @@ export default {
     client: ClientType,
     message: OmitPartialGroupDMChannel<Message<boolean>>
   ) {
-    if (message.author.bot) return;
+    if (message.author.bot || message.author.id === "970152105392361543" || message.author.id === "930725141183348769") return;
     if (
       client.guessGames.has(message.channel.id) &&
       !message.content.includes(client.user?.id ?? "")
