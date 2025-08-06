@@ -35,7 +35,7 @@ async function handleAircraftGuess(message: Message, client: ClientType) {
   const guessGame = client.guessGames.get(message.channel.id ?? "");
   console.log(guessGame);
   if (!guessGame) return;
-  if (message.content.length != 4) return;
+  if (message.content.length > 4) return;
   const guess = message.content.trim();
   console.log(guess);
   if (guess.length === 0) return;
