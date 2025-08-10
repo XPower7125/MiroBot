@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction, MessageFlags, EmbedBuilder } from "discord.js";
 import { env } from "process";
-import { redis } from "~/utils/redis.js";
+import { redis } from "../../utils/redis.js";
 
   export default {
     data: new SlashCommandBuilder()
