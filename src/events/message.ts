@@ -1,7 +1,7 @@
 import { Message, type OmitPartialGroupDMChannel } from "discord.js";
 import type { ClientType } from "../types.js";
 import { genMistyOutput } from "../lib.js";
-import { ratelimit } from "../utils/ratelimit.js";
+import { ratelimit } from "../utils/redis.js";
 
 async function recursivelyFetchMessage(
   message: Message,
