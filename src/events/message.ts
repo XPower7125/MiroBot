@@ -35,6 +35,7 @@ async function handleAircraftGuess(message: Message, client: ClientType) {
   const guessGame = client.guessGames.get(message.channel.id ?? "");
   console.log(guessGame);
   if (!guessGame) return;
+  if (message.content.length > 4) return;
   const guess = message.content.trim();
   console.log(guess);
   if (guess.length === 0) return;
@@ -56,7 +57,7 @@ export default {
     client: ClientType,
     message: OmitPartialGroupDMChannel<Message<boolean>>
   ) {
-    if (message.author.bot) return;
+    if (message.author.bot || message.author.id === "970152105392361543" || message.author.id === "930725141183348769") return;
     if (
       client.guessGames.has(message.channel.id) &&
       !message.content.includes(client.user?.id ?? "")
