@@ -1,7 +1,7 @@
 import { Message, type OmitPartialGroupDMChannel } from "discord.js";
 import type { ClientType } from "../types.js";
 import { genMistyOutput } from "../lib.js";
-import { ratelimit } from "../utils/redis.js";
+import { ratelimit, redis } from "../utils/redis.js";
 
 async function recursivelyFetchMessage(
   message: Message,
@@ -57,7 +57,12 @@ export default {
     client: ClientType,
     message: OmitPartialGroupDMChannel<Message<boolean>>
   ) {
-    if (message.author.bot || message.author.id === "970152105392361543" || message.author.id === "930725141183348769") return;
+    if (message.author.bot) return;
+    const isUserBlacklisted = await redis.get(`blacklist:${message.author.id}`);
+    if (isUserBlacklisted) {
+      await message.reply("I don't wanna talk to you D:<");
+      return;
+    }
     if (
       client.guessGames.has(message.channel.id) &&
       !message.content.includes(client.user?.id ?? "")

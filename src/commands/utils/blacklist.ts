@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction, MessageFlags, EmbedBuilder } from "discord.js";
+import { env } from "process";
 import { redis } from "~/utils/redis.js";
 
   export default {
@@ -10,7 +11,7 @@ import { redis } from "~/utils/redis.js";
       .addSubcommand((subcommand) => subcommand.setName("query").setDescription("Gets info about a user on the blacklist").addUserOption((option) => option.setName("user").setDescription("The user to query").setRequired(true)))
       .setDescription("Commands to manage blacklist"),
     async execute(interaction: ChatInputCommandInteraction) {
-      
+      if (interaction.user.id !== env.OWNER_ID) return;
       switch (interaction.options.getSubcommand()) {
         case "add": {
             const user = interaction.options.getUser("user");
