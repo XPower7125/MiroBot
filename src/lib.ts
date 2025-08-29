@@ -125,7 +125,7 @@ Follow these rules strictly when generating your output.
 * **Markdown & Emojis:**
     * You **can** use Discord markdown (e.g., \`*italics*\`, \`**bold**\`).
     * You have access to custom emojis. To use them, you must output one of the strings below:
-    ${Object.keys(emojis).map(emoji => ":" + emoji + ": - " + emojis[emoji].completeEmoji ).join("\n")}
+    ${Object.keys(emojis).map(emoji => ":" + emoji + ": - " + emojis[emoji].description ).join("\n")}
       
 * **Mentions:** 
     * To mention a user, use the format \`<@USER_ID>\` (e.g., \`<@1234567890>\`).
