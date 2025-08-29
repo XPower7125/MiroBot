@@ -15,6 +15,76 @@ import { getVoiceConnection } from "@discordjs/voice";
 import NodeID3 from "node-id3";
 import { posthogClient, eventTypes } from "./analytics.js";
 
+const emojis: Record<string, { completeEmoji: string, description: string }> = {
+  misty: {
+    completeEmoji: "<:misty:1375491015582027806>",
+    description: "This is the custom emoji for Misty. You can use it to refer to yourself."
+  },
+  misty_old: {
+    completeEmoji: "<:misty_old:1382591554392166440>",
+    description: "This is the custom emoji for Misty. You can use it to refer to yourself."
+  },
+  box: {
+    completeEmoji: "<:box:1382354745359990816>",
+    description: "This is you in a box. You can use it to refer to yourself, for example when talking about boxes."
+  },
+  upsidedown: {
+    completeEmoji: "<:upsidedown:1382354736635969649>",
+    description: "This is you upside down. You can use it to refer to yourself, for example when talking about something weird."
+  },
+  lick: {
+    completeEmoji: "<:lick:1382354734454669444>",
+    description: "This is you in a goofy pose. You can use it to refer to yourself, for example when talking about something goofy or dumb."
+  },
+  observing: {
+    completeEmoji: "<:observing:1382702616886120621>",
+    description: "This is you observing something. You can use it to refer to yourself, for example when talking about something you are observing or find weird."
+  },
+  huh: {
+    completeEmoji: "<:huh:1404363219228950608>",
+    description: "This is you huh? You can use it to refer to yourself, for example when talking about something you are unsure about or don't understand."
+  },
+  cute_misty: {
+    completeEmoji: "<:cute_misty:1382726080644907019>",
+    description: "This is you in a cute pose. You can use it to refer to yourself, for example when talking about something cute or adorable."
+  },
+  meem: {
+    completeEmoji: "<:meem:1383550044753498113>",
+    description: "This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about flight simulation."
+  },
+  pwease: {
+    completeEmoji: "<:pwease:1404364173940625488>",
+    description: "This is you in a pose asking for something. You can use it to refer to yourself, for example when talking about something you are asking for or need, or when saying please."
+  },
+  looking_down: {
+    completeEmoji: "<:looking_down:1394593637278683226>",
+    description: "This is you looking down. You can use it to refer to yourself, for example when talking about something you are looking down on or find weird."
+  },
+  Misty3: {
+    completeEmoji: "<:Misty3:1399443434020012182>",
+    description: "This is you looking up. You can use it to refer to yourself, for example when talking about something you are looking up on."
+  },
+  mistyselfie: {
+    completeEmoji: "<:mistyselfie:1399444587755602060>",
+    description: "This is a selfie of you. You can use it to refer to yourself, for example when talking about yourself."
+  },
+  emoji_130: {
+    completeEmoji: "<:emoji_130:1390753438186344468>",
+    description: "This is a picture of you laying down. You can use it to refer to yourself, for example when talking about napping."
+  },
+  angrymisty: {
+    completeEmoji: "<:angrymisty:1400085093950689300>",
+    description: "This is you in an angry pose. You can use it to refer to yourself, for example when talking about something you are angry about."
+  }
+};
+
+function makeCompleteEmoji(text: string) {
+  Object.keys(emojis).forEach(emoji => {
+    text = text.replace(":" + emoji + ":", emojis[emoji].completeEmoji);
+  });
+  return text;
+}
+
 const systemPrompt = `
 ### **1. Core Persona: Who You Are**
 
@@ -55,21 +125,8 @@ Follow these rules strictly when generating your output.
 * **Markdown & Emojis:**
     * You **can** use Discord markdown (e.g., \`*italics*\`, \`**bold**\`).
     * You have access to custom emojis. To use them, you must output one of the strings below:
-      * <:misty:1375491015582027806> | This is the custom emoji for Misty. You can use it to refer to yourself.
-      * <:misty_old:1382591554392166440> | This is the custom emoji for Misty. You can use it to refer to yourself.
-      * <:box:1382354745359990816> | This is you in a box. You can use it to refer to yourself, for example when talking about boxes.
-      * <:upsidedown:1382354736635969649> | This is you upside down. You can use it to refer to yourself, for example when talking about something weird.
-      * <:lick:1382354734454669444> | This is you in a goofy pose. You can use it to refer to yourself, for example when talking about something goofy or dumb.
-      * <:observing:1382702616886120621> | This is you observing something. You can use it to refer to yourself, for example when talking about something you are observing or find weird. 
-      * <:huh:1382710539700146256> | This is you huh? You can use it to refer to yourself, for example when talking about something you are unsure about or don't understand.
-      * <:cute_misty:1382726080644907019> | This is you in a cute pose. You can use it to refer to yourself, for example when talking about something cute or adorable.
-      * <:meem:1383550044753498113> | This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about flight simulation.
-      * <:pwease:1404364173940625488> | This is you in a pose asking for something. You can use it to refer to yourself, for example when talking about something you are asking for or need, or when saying please.
-      * <:looking_down:1394593637278683226> | This is you looking down. You can use it to refer to yourself, for example when talking about something you are looking down on or find weird.
-      * <:Misty3:1399443434020012182>  | This is you looking up. You can use it to refer to yourself, for example when talking about something you are looking up on.
-      * <:mistyselfie:1399444587755602060> | This is a selfie of you. You can use it to refer to yourself, for example when talking about yourself.
-      * <:emoji_130:1390753438186344468> | This is a picture of you laying down. You can use it to refer to yourself, for example when talking about napping.
-      * <:angrymisty:1400085093950689300> | This is you in an angry pose. You can use it to refer to yourself, for example when talking about something you are angry about.
+    ${Object.keys(emojis).map(emoji => ":" + emoji + ": - " + emojis[emoji].completeEmoji ).join("\n")}
+      
 * **Mentions:** 
     * To mention a user, use the format \`<@USER_ID>\` (e.g., \`<@1234567890>\`).
     * Your own user ID is \`<@${process.env.BOT_CLIENT_ID}>\`.
@@ -326,7 +383,7 @@ export async function genMistyOutput(
     });
     console.log("Score: " + classificationScoring);
     console.log("Classification: " + messageClassification);
-    return message;
+    return makeCompleteEmoji(message);
   } catch (error) {
     console.log(error);
     console.log(JSON.stringify(error));
