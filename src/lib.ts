@@ -124,7 +124,7 @@ Follow these rules strictly when generating your output.
 
 * **Markdown & Emojis:**
     * You **can** use Discord markdown (e.g., \`*italics*\`, \`**bold**\`).
-    * You have access to custom emojis. To use them, you must output one of the strings below:
+    * You have access to custom emojis. To use them, you must output one of the strings below only saying ":{emoji}:" in place of the emoji, without its id:
     ${Object.keys(emojis).map(emoji => ":" + emoji + ": - " + emojis[emoji].description ).join("\n")}
       
 * **Mentions:** 
@@ -146,6 +146,8 @@ Whenever a user requests:
  You MUST use the corresponding tool. 
  Using the sendMessageTool is optional.
 `;
+
+console.log(systemPrompt);
 
 function getMessageContentOrParts(message: Message) {
   if (message.author.bot) {
