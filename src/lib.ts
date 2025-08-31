@@ -79,6 +79,10 @@ const emojis: Record<string, { completeEmoji: string, description: string }> = {
 };
 
 function makeCompleteEmoji(text: string) {
+  // Replace anything matching <:emoji:id> with :emoji:
+  text = text.replace(/<a?:(\w+):(\d+)>/g, (match, emoji) => {
+    return `:${emoji}:`;
+  });
   Object.keys(emojis).forEach(emoji => {
     text = text.replace(":" + emoji + ":", emojis[emoji].completeEmoji);
   });
@@ -124,7 +128,7 @@ Follow these rules strictly when generating your output.
 
 * **Markdown & Emojis:**
     * You **can** use Discord markdown (e.g., \`*italics*\`, \`**bold**\`).
-    * You have access to custom emojis. To use them, you must output one of the strings below only saying ":{emoji}:" in place of the emoji, without its id:
+    * You have access to custom emojis. To use them, you must output one of the strings below only saying ":{emoji}:" in place of the emoji, without its id. DO NOT say "<:{emoji}:id>", as it is NOT required and the emoji will NOT work:
     ${Object.keys(emojis).map(emoji => ":" + emoji + ": - " + emojis[emoji].description ).join("\n")}
       
 * **Mentions:** 
@@ -164,13 +168,13 @@ function getMessageContentOrParts(message: Message) {
       role: "assistant" as const,
     };
   }
+  console.log(message.cleanContent)
   return {
     role: "user" as const,
     content: [
       {
         type: "text",
         text: JSON.stringify({
-          content: message.content,
           author: message.author,
           cleanContent: message.cleanContent,
           attachments: message.attachments.map((attachment) => ({
@@ -281,28 +285,8 @@ export async function genMistyOutput(
     },
   });
 
-  console.log(
-    "messages",
-    messages.map(
-      (message) => message.author.displayName + " - " + message.content
-    )
-  );
   
   try {
-    console.log(
-      messages.map((message) =>
-        message.attachments.map(
-          (attachment) =>
-            attachment.url +
-            ", " +
-            attachment.name +
-            ", " +
-            attachment.contentType +
-            ", " +
-            attachment.size
-        )
-      )
-    );
     const response = await generateText({
       model: google("gemini-2.0-flash-lite"),
       system: systemPrompt,
@@ -365,8 +349,6 @@ export async function genMistyOutput(
       return text;
     }
     const { message, messageClassification, classificationScoring } = toolResponse;
-    console.log(JSON.stringify(response));
-    console.log(text);
     posthogClient.capture({
       event: eventTypes.aiMessage,
       distinctId: latestMessage.author.id,
