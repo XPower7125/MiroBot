@@ -17,10 +17,9 @@ export default {
             .setRequired(true)
     ),
   async execute(interaction: ChatInputCommandInteraction) {
-    let { success } = await askLimit.limit(
+    const { success } = await askLimit.limit(
       interaction.user.id
     );
-    success = true;
     if (!success) {
         await interaction.reply({
             content: "You have already requested a reset today.",
