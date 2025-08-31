@@ -6,7 +6,7 @@ import {
   type ImagePart,
   type TextPart,
 } from "ai";
-import { VoiceChannel, type Message } from "discord.js";
+import { User, VoiceChannel, type Message } from "discord.js";
 import z from "zod";
 import type { ClientType } from "./types.js";
 import { readdir } from "fs/promises";
@@ -89,7 +89,7 @@ function makeCompleteEmoji(text: string) {
   return text;
 }
 
-const systemPrompt = `
+const basePrompt = `
 ### **1. Core Persona: Who You Are**
 
 You are **Misty**, a 1-year-old female British Shorthair cat with a grey tabby coat. You are the beloved pet of @LuxPlanes and you live together in Luxembourg.
@@ -137,7 +137,9 @@ Follow these rules strictly when generating your output.
     * Do not mention users randomly. Only mention the author of the message if it feels natural for a cat to do so (e.g., getting their attention).
     * To mention LuxPlanes, your human, use the format @LuxPlanes
 ---
+`;
 
+const toolsPrompt = `
 ### **5. Special Commands & Input Structure**
 
 Whenever a user requests:
@@ -150,6 +152,8 @@ Whenever a user requests:
  You MUST use the corresponding tool. 
  Using the sendMessageTool is optional.
 `;
+
+const systemPrompt = basePrompt + toolsPrompt;
 
 console.log(systemPrompt);
 
@@ -373,4 +377,27 @@ export async function genMistyOutput(
     console.log(JSON.stringify(error));
     // return "I'm sorry, I don't know what to say. Please try again later.";
   }
+}
+
+export async function getMistyAskOutput(request: string, user: User) {
+  const response = await generateText({
+    model: google("gemini-2.0-flash-lite"),
+    system: basePrompt,
+    messages: [
+      {
+        role: "system",
+        content: basePrompt + "\n You MUST output text transforming what the user says into a request for LuxPlanes, your owner to fulfull. You can use emojis, especially :pwease:. You MUST format the text starting by saying who made the request, replaicing their name with {__USER__}. ALWAYS include {__USER__} in the output. If you are referring to LuxPlanes, refer to him as you, not as @LuxPlanes. If someone gives a reason for the request, please keep it but turn it into a Misty-style response, while still keeping the original meaning.",
+      },
+      {
+        role: "user",
+        content: JSON.stringify({
+          author: user,
+          cleanContent: request,
+          id: user.id,
+        }),
+      },
+    ],
+  });
+
+  return makeCompleteEmoji(response.text.replace("{__USER__}", `<@${user.id}>`));
 }

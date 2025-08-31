@@ -14,3 +14,9 @@ export const increaseLimit = new Ratelimit({
   limiter: Ratelimit.fixedWindow(1, "24 h"),
   analytics: true,
 });
+
+export const askLimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.fixedWindow(1, "1 h"),
+  analytics: true,
+});
