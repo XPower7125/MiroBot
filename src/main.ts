@@ -13,6 +13,7 @@ import type { ClientType, EventType, CommandType, ModalType } from "./types.js";
 import { fileURLToPath } from "url";
 import { getVoiceChannels, hasMembers, playAudio } from "./utils/voice.js";
 import { eventTypes, posthogClient } from "./analytics.js";
+import { askLimit } from "./utils/redis.js";
 
 console.log("Starting up Misty");
 
@@ -43,6 +44,8 @@ const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs.readdirSync(eventsPath);
 const modalsPath = path.join(__dirname, "modals");
 const modalFiles = fs.readdirSync(modalsPath);
+
+// askLimit.resetUsedTokens("1174713902454554688")
 
 for (const folder of commandFolders) {
   const commandsPath = path.join(commandsFoldersPath, folder);

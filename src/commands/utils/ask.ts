@@ -17,20 +17,20 @@ export default {
             .setRequired(true)
     ),
   async execute(interaction: ChatInputCommandInteraction) {
+    await interaction.deferReply();
     const { success } = await askLimit.limit(
       interaction.user.id
     );
     if (!success) {
-        await interaction.reply({
-            content: "You have already requested a reset today.",
+        await interaction.followUp({
+            content: "You have already requested something this hour.",
             flags: MessageFlags.Ephemeral,
         });
         return;
     }
-    await interaction.deferReply();
     const request = interaction.options.getString("request");
     if (!request) {
-      await interaction.reply({
+      await interaction.followUp({
         content: "You must provide a request.",
         flags: MessageFlags.Ephemeral,
       });
