@@ -4,7 +4,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { askLimit } from "../../utils/redis.js";
-import { getMistyAskOutput } from "~/lib.js";
+import { getMistyAskOutput } from "../../lib.js";
 
 export default {
   data: new SlashCommandBuilder()
