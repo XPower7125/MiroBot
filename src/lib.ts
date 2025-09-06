@@ -371,7 +371,7 @@ export async function genMistyOutput(
     });
     console.log("Score: " + classificationScoring);
     console.log("Classification: " + messageClassification);
-    return makeCompleteEmoji(message);
+    return makeCompleteEmoji(message).replace(/\b(?:i(?:['’])?m|i am)\s+a\s+dog\w*\b([.!?])?/gi, "I'm not a dog$1");
   } catch (error) {
     console.log(error);
     console.log(JSON.stringify(error));
@@ -399,5 +399,5 @@ export async function getMistyAskOutput(request: string, user: User) {
     ],
   });
 
-  return makeCompleteEmoji(response.text.replace("{__USER__}", `<@${user.id}>`)).replace(/I'm a dog/gi, "I'm not a dog").replace(/I am a dog/gi, "I'm not a dog");
+  return makeCompleteEmoji(response.text.replace("{__USER__}", `<@${user.id}>`))
 }
