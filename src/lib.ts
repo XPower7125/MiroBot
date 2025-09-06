@@ -399,5 +399,5 @@ export async function getMistyAskOutput(request: string, user: User) {
     ],
   });
 
-  return makeCompleteEmoji(response.text.replace("{__USER__}", `<@${user.id}>`));
+  return makeCompleteEmoji(response.text.replace("{__USER__}", `<@${user.id}>`)).replace(/I'm a dog/gi, "I'm not a dog").replace(/I am a dog/gi, "I'm not a dog");
 }
