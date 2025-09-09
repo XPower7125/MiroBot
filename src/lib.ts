@@ -428,7 +428,7 @@ export async function genMistyOutput(
     console.log("Score: " + classificationScoring);
     console.log("Classification: " + messageClassification);
     return makeCompleteEmoji(message).replace(
-      /\b(?:i(?:['’])?m|i am)\s+a\s+dog\w*\b([.!?])?/gi,
+      /\b(?:i(?:['’])?m|i am)\s+a\s+d(o|0)g\w*\b([.!?])?/gi,
       "I'm not a dog$1"
     );
   } catch (error) {
