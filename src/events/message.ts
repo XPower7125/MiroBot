@@ -58,7 +58,7 @@ export default {
     message: OmitPartialGroupDMChannel<Message<boolean>>
   ) {
     if (message.author.bot) return;
-    
+
     if (
       client.guessGames.has(message.channel.id) &&
       !message.content.includes(client.user?.id ?? "")
@@ -76,12 +76,13 @@ export default {
       completeMessageReference?.author.id !== client.user?.id
     )
       return;
-      const isUserBlacklisted = await redis.get(`blacklist:${message.author.id}`);
+    const isUserBlacklisted = await redis.get(`blacklist:${message.author.id}`);
     if (isUserBlacklisted) {
       await message.reply("I don't wanna talk to you D:<");
       return;
     }
     const { success, reset } = await ratelimit.limit(message.author.id);
+
     if (!success) {
       return await message.reply(
         `You ran out of messages! Retry <t:${Math.floor(reset / 1000)}:R>`
@@ -89,9 +90,8 @@ export default {
     }
     try {
       await message.channel.sendTyping();
-    }
-    catch {
-      console.log("Failed to send typing bruh")
+    } catch {
+      console.log("Failed to send typing bruh");
     }
     const messages = await recursivelyFetchMessage(message, 10);
 
