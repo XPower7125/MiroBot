@@ -388,6 +388,7 @@ export async function genMistyOutput(
       posthogClient.capture({
         event: eventTypes.aiMessage,
         distinctId: latestMessage.author.id,
+
         properties: {
           $set: {
             name: latestMessage.author.username,
@@ -395,6 +396,7 @@ export async function genMistyOutput(
             avatar: latestMessage.author.avatarURL(),
             userId: latestMessage.author.id,
           },
+          distinct_id: latestMessage.author.id,
           message: latestMessage.cleanContent,
           response: text,
           messageClassification: "general",
