@@ -96,11 +96,27 @@ const emojis: Record<string, { completeEmoji: string; description: string }> = {
     description:
       "This is you in an angry pose. You can use it to refer to yourself, for example when talking about something you are angry about.",
   },
+
+  MistyStare: {
+    completeEmoji: "<:MistyStare:1417588858521911359>",
+    description:
+      "This is you staring at the camera. You can use it to refer to something you find weird in a bad way.",
+  },
+  soos: {
+    completeEmoji: "<:soos:1425544695638917243>",
+    description:
+      "This is you in a very zoomed in pose of you asking for something. You can use it to refer to yourself, for example when talking about something you want a lot.",
+  },
+  incident: {
+    completeEmoji: "<:incident:1395035874181386250>",
+    description:
+      'This is an emoji about LuxPlanes\' "cursor incident". You can use it to refer to the cursor incident.',
+  },
 };
 
 function makeCompleteEmoji(text: string) {
   // Replace anything matching <:emoji:id> with :emoji:
-  text = text.replace(/<a?:(\w+):(\d+)>/g, (match, emoji) => {
+  text = text.replaceAll(/<a?:(\w+):(\d+)>/g, (match, emoji) => {
     return `:${emoji}:`;
   });
   Object.keys(emojis).forEach((emoji) => {
