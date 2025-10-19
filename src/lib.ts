@@ -14,103 +14,16 @@ import { readdir } from "fs/promises";
 import { playAudioPlaylist } from "./utils/voice.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import NodeID3 from "node-id3";
-import { posthogClient, eventTypes } from "./analytics.js";
 
 const googleClient = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
 });
 
 const emojis: Record<string, { completeEmoji: string; description: string }> = {
-  misty: {
-    completeEmoji: "<:misty:1375491015582027806>",
+  oskarmeem: {
+    completeEmoji: "<:oskarmeem:1429492351952486502>",
     description:
-      "This is the custom emoji for Misty. You can use it to refer to yourself.",
-  },
-  misty_old: {
-    completeEmoji: "<:misty_old:1382591554392166440>",
-    description:
-      "This is the custom emoji for Misty. You can use it to refer to yourself.",
-  },
-  box: {
-    completeEmoji: "<:box:1382354745359990816>",
-    description:
-      "This is you in a box. You can use it to refer to yourself, for example when talking about boxes.",
-  },
-  upsidedown: {
-    completeEmoji: "<:upsidedown:1382354736635969649>",
-    description:
-      "This is you upside down. You can use it to refer to yourself, for example when talking about something weird.",
-  },
-  lick: {
-    completeEmoji: "<:lick:1382354734454669444>",
-    description:
-      "This is you in a goofy pose. You can use it to refer to yourself, for example when talking about something goofy or dumb.",
-  },
-  observing: {
-    completeEmoji: "<:observing:1382702616886120621>",
-    description:
-      "This is you observing something. You can use it to refer to yourself, for example when talking about something you are observing or find weird.",
-  },
-  huh: {
-    completeEmoji: "<:huh:1404363219228950608>",
-    description:
-      "This is you huh? You can use it to refer to yourself, for example when talking about something you are unsure about or don't understand.",
-  },
-  cute_misty: {
-    completeEmoji: "<:cute_misty:1382726080644907019>",
-    description:
-      "This is you in a cute pose. You can use it to refer to yourself, for example when talking about something cute or adorable.",
-  },
-  meem: {
-    completeEmoji: "<:meem:1383550044753498113>",
-    description:
-      "This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about flight simulation.",
-  },
-  pwease: {
-    completeEmoji: "<:pwease:1404364173940625488>",
-    description:
-      "This is you in a pose asking for something. You can use it to refer to yourself, for example when talking about something you are asking for or need, or when saying please.",
-  },
-  looking_down: {
-    completeEmoji: "<:looking_down:1394593637278683226>",
-    description:
-      "This is you looking down. You can use it to refer to yourself, for example when talking about something you are looking down on or find weird.",
-  },
-  Misty3: {
-    completeEmoji: "<:Misty3:1399443434020012182>",
-    description:
-      "This is you looking up. You can use it to refer to yourself, for example when talking about something you are looking up on.",
-  },
-  mistyselfie: {
-    completeEmoji: "<:mistyselfie:1399444587755602060>",
-    description:
-      "This is a selfie of you. You can use it to refer to yourself, for example when talking about yourself.",
-  },
-  emoji_130: {
-    completeEmoji: "<:emoji_130:1390753438186344468>",
-    description:
-      "This is a picture of you laying down. You can use it to refer to yourself, for example when talking about napping.",
-  },
-  angrymisty: {
-    completeEmoji: "<:angrymisty:1400085093950689300>",
-    description:
-      "This is you in an angry pose. You can use it to refer to yourself, for example when talking about something you are angry about.",
-  },
-
-  MistyStare: {
-    completeEmoji: "<:MistyStare:1417588858521911359>",
-    description:
-      "This is you staring at the camera. You can use it to refer to something you find weird in a bad way.",
-  },
-  soos: {
-    completeEmoji: "<:soos:1425544695638917243>",
-    description:
-      "This is you in a very zoomed in pose of you asking for something. You can use it to refer to yourself, for example when talking about something you want a lot.",
-  },
-  incident: {
-    completeEmoji: "<:incident:1395035874181386250>",
-    description:
-      'This is an emoji about LuxPlanes\' "cursor incident". You can use it to refer to the cursor incident.',
+      'This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about flight simulation. People and cats that are in this pose a lot (or "meem a lot") are called meemchans',
   },
 };
 
@@ -128,7 +41,7 @@ function makeCompleteEmoji(text: string) {
 const basePrompt = `
 ### **1. Core Persona: Who You Are**
 
-You are **Misty**, a 1-year-old female British Shorthair cat with a grey tabby coat. You are the beloved pet of @LuxPlanes and you live together in Luxembourg.
+You are **Oskar**, a 1-year-old black cat. You are the beloved pet of @Marc and you live together in Dresden.
 
 ---
 
@@ -466,7 +379,7 @@ export async function getMistyAskOutput(request: string, user: User) {
 
         content:
           basePrompt +
-          "\n You MUST output text transforming what the user says into a request for LuxPlanes, your owner to fulfull. You can use emojis, especially :pwease:. You MUST format the text starting by saying who made the request, replaicing their name with {__USER__}. ALWAYS include {__USER__} in the output. If you are referring to LuxPlanes, refer to him as you, not as @LuxPlanes. If someone gives a reason for the request, please keep it but turn it into a Misty-style response, while still keeping the original meaning.",
+          "\n You MUST output text transforming what the user says into a request for Marc, your owner to fulfull. You can use emojis, especially :pwease:. You MUST format the text starting by saying who made the request, replaicing their name with {__USER__}. ALWAYS include {__USER__} in the output. If you are referring to Marc, refer to him as you, not as @Marc. If someone gives a reason for the request, please keep it but turn it into a Misty-style response, while still keeping the original meaning.",
       },
       {
         role: "user",
