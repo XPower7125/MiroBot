@@ -76,20 +76,6 @@ export async function playAudioPlaylist(
 
   function playRandomSong() {
     const filename = filenames[Math.floor(Math.random() * filenames.length)];
-    posthogClient.capture({
-      event: eventTypes.songPlay,
-      distinctId: user.id,
-      properties: {
-        $set: {
-          name: user.username,
-          displayName: user.displayName,
-          avatar: user.avatarURL(),
-          userId: user.id,
-        },
-        channel: channel.name,
-        song: filename,
-      },
-    });
     const filePath = join(process.cwd(), playlistPath, filename ?? "");
     console.log(`Playing ${filename}`);
     console.log(filePath);
@@ -148,20 +134,7 @@ export async function playAudioPlaylist(
       channel.guild.id,
       resource
     );
-    posthogClient.capture({
-      event: eventTypes.songPlay,
-      distinctId: user.id,
-      properties: {
-        $set: {
-          name: user.username,
-          displayName: user.displayName,
-          avatar: user.avatarURL(),
-          userId: user.id,
-        },
-        channel: channel.name,
-        song: filename,
-      },
-    });
+
     player.play(resource);
   } else {
     playRandomSong();

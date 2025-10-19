@@ -9,13 +9,12 @@ import fs from "fs";
 import path from "path";
 
 import dotenv from "dotenv";
-import type { ClientType, EventType, CommandType, ModalType } from "./types.js";
+import type { ClientType, EventType, CommandType } from "./types.js";
 import { fileURLToPath } from "url";
 import { getVoiceChannels, hasMembers, playAudio } from "./utils/voice.js";
-import { eventTypes, posthogClient } from "./analytics.js";
 // import { askLimit } from "./utils/redis.js";
 
-console.log("Starting up Misty");
+console.log("Starting up Oskar");
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -36,14 +35,10 @@ client.events = new Collection();
 client.players = new Collection();
 client.audioResources = new Collection();
 client.guessGames = new Collection();
-client.modals = new Collection();
-client.modalsMessageState = new Collection();
 const commandsFoldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(commandsFoldersPath);
 const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs.readdirSync(eventsPath);
-const modalsPath = path.join(__dirname, "modals");
-const modalFiles = fs.readdirSync(modalsPath);
 
 // askLimit.resetUsedTokens("1174713902454554688")
 
@@ -77,12 +72,6 @@ for (const file of eventFiles) {
   client.events.set(event.eventType, event);
 }
 
-for (const modal of modalFiles) {
-  const filePath = new URL("file://" + path.join(modalsPath, modal));
-  const modalModule = (await import(filePath.toString())).default as ModalType;
-  client.modals.set(modalModule.modalId, modalModule);
-}
-
 async function playMeowOnGuilds() {
   const guilds = client.guilds.cache.filter(
     (guild) => guild.members.cache.filter((member) => member.user.bot).size > 0
@@ -98,13 +87,6 @@ async function playMeowOnGuilds() {
           console.log("Meowing on guard!");
         }
         if (randomValue < 0.25 || channel.name === "121.5") {
-          posthogClient.capture({
-            event: eventTypes.meow,
-            distinctId: channel.id,
-            properties: {
-              channel: channel.name,
-            },
-          });
           await playAudio(channel, "assets/meow.mp3");
           console.log("Meowed successfully!");
         }
@@ -129,19 +111,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       );
       return;
     }
-    posthogClient.capture({
-      event: eventTypes.commandExecute,
-      distinctId: interaction.user.id,
-      properties: {
-        command: interaction.commandName,
-        $set: {
-          name: interaction.user.username,
-          displayName: interaction.user.displayName,
-          avatar: interaction.user.avatarURL(),
-          userId: interaction.user.id,
-        },
-      },
-    });
     try {
       await command.execute(interaction);
     } catch (error) {
@@ -158,20 +127,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
             flags: MessageFlags.Ephemeral,
           });
         } catch (error) {
-          posthogClient.capture({
-            event: eventTypes.interactionError,
-            distinctId: interaction.user.id,
-            properties: {
-              type: "command",
-              error: (error as Error).message,
-              $set: {
-                name: interaction.user.username,
-                displayName: interaction.user.displayName,
-                avatar: interaction.user.avatarURL(),
-                userId: interaction.user.id,
-              },
-            },
-          });
           console.error(error);
         }
       }
@@ -186,19 +141,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       );
       return;
     }
-    posthogClient.capture({
-      event: eventTypes.commandExecute,
-      distinctId: interaction.user.id,
-      properties: {
-        command: interaction.commandName,
-        $set: {
-          name: interaction.user.username,
-          displayName: interaction.user.displayName,
-          avatar: interaction.user.avatarURL(),
-          userId: interaction.user.id,
-        },
-      },
-    });
     try {
       await command.execute(interaction);
     } catch (error) {
@@ -233,77 +175,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     try {
       await command.autocomplete(interaction);
     } catch (error) {
-      posthogClient.capture({
-        event: eventTypes.interactionError,
-        distinctId: interaction.user.id,
-        properties: {
-          type: "contextMenu",
-          error: (error as Error).message,
-          $set: {
-            name: interaction.user.username,
-            displayName: interaction.user.displayName,
-            avatar: interaction.user.avatarURL(),
-            userId: interaction.user.id,
-          },
-        },
-      });
       console.error(error);
-    }
-  }
-
-  if (interaction.isModalSubmit()) {
-    console.log(interaction.customId);
-    const modalModule = client.modals.get(interaction.customId);
-    if (!modalModule) {
-      console.error(`No modal matching ${interaction.customId} was found.`);
-      return;
-    }
-    posthogClient.capture({
-      event: eventTypes.modalOpen,
-      distinctId: interaction.user.id,
-      properties: {
-        modalId: interaction.customId,
-        $set: {
-          name: interaction.user.username,
-          displayName: interaction.user.displayName,
-          avatar: interaction.user.avatarURL(),
-          userId: interaction.user.id,
-        },
-      },
-    });
-    try {
-      modalModule.execute(client, interaction);
-    } catch (error) {
-      console.error(error);
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({
-          content: "There was an error while executing this command!",
-          flags: MessageFlags.Ephemeral,
-        });
-      } else {
-        try {
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
-        } catch (error) {
-          posthogClient.capture({
-            event: eventTypes.interactionError,
-            distinctId: interaction.user.id,
-            properties: {
-              type: "modal",
-              error: (error as Error).message,
-              $set: {
-                name: interaction.user.username,
-                displayName: interaction.user.displayName,
-                avatar: interaction.user.avatarURL(),
-                userId: interaction.user.id,
-              },
-            },
-          });
-          console.error(error);
-        }
-      }
     }
   }
 });

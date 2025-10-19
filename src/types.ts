@@ -29,18 +29,11 @@ export type ClientType = Client<boolean> & {
   players: Collection<string, AudioPlayer>;
   audioResources: Collection<string, AudioResource>;
   guessGames: Collection<string, GuessGame>;
-  modals: Collection<string, ModalType>;
   modalsMessageState: Collection<string, Message>;
 };
 
 export interface EventType {
   eventType: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  execute: (client: ClientType, ...args: any[]) => unknown;
-}
-
-export interface ModalType {
-  modalId: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: (client: ClientType, ...args: any[]) => unknown;
 }
