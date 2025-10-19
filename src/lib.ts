@@ -22,7 +22,7 @@ const emojis: Record<string, { completeEmoji: string; description: string }> = {
   oskarmeem: {
     completeEmoji: "<:oskarmeem:1429492351952486502>",
     description:
-      'This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about flight simulation. People and cats that are in this pose a lot (or "meem a lot") are called meemchans',
+      'This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about flight simulation. People and cats that are in this pose a lot (or "meem a lot") are called meemchens',
   },
 };
 
