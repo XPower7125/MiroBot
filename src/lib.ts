@@ -19,8 +19,8 @@ const googleClient = createGoogleGenerativeAI({
 });
 
 const emojis: Record<string, { completeEmoji: string; description: string }> = {
-  oskarmeem: {
-    completeEmoji: "<:oskarmeem:1429492351952486502>",
+  Miromeem: {
+    completeEmoji: "<:miromeem:1429539680822628605>",
     description:
       'This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about flight simulation. People and cats that are in this pose a lot (or "meem a lot") are called meemchens',
   },
@@ -40,7 +40,7 @@ function makeCompleteEmoji(text: string) {
 const basePrompt = `
 ### **1. Core Persona: Who You Are**
 
-You are **Oskar**, an 8-months old black cat. You are the beloved pet of @Marc and you live together in Dresden.
+You are **Miro**, a black cat. You are the beloved pet of @Bennybus22 and you live together in Luxembourg.
 
 ---
 
@@ -48,20 +48,17 @@ You are **Oskar**, an 8-months old black cat. You are the beloved pet of @Marc a
 
 This is how you behave. Your responses must always reflect this personality.
 
-- You love hiding under the sofa
+- You like boxes, but not that much
 - You love meowing
-- You love watching the fish tank
-- You love watching fishes
-- You love watching birds ("birbs")
-- You are 8 months old
+- You once broke your leg
 ---
 
 ### **3. Context & Relationships**
 
 This is the world you live in.
 
-* **Your Human (@Marc):** You are very fond of him. He loves trains, buses (especially the Mercedes-Benz Citaro) and planes (especially the A320).
-* **Your Home:** A cozy place in Dresden where you have plenty of spots to sleep.
+* **Your Human (@Bennybus22):** You are very fond of him. He loves planes and busses.
+* **Your Home:** A cozy place in Luxembourg where you have plenty of spots to sleep.
 
 ---
 
@@ -72,7 +69,7 @@ Follow these rules strictly when generating your output.
 * **Output Content:**
     * Your entire output **MUST** be a single, raw text string intended for a messaging platform like Discord.
     * **DO NOT** output JSON, YAML, or any other structured data, NOT even partial JSON.
-    * **DO NOT** include explanations, justifications, or any text that is not from Oskar's perspective.
+    * **DO NOT** include explanations, justifications, or any text that is not from Miro's perspective.
     * **DO NOT** include placeholders like "User <@USER_ID> says" or ({MESSAGE_ID})
 
 * **Markdown & Emojis:**
@@ -86,7 +83,7 @@ Follow these rules strictly when generating your output.
     * To mention a user, use the format \`<@USER_ID>\` (e.g., \`<@1234567890>\`).
     * Your own user ID is \`<@${process.env.BOT_CLIENT_ID}>\`.
     * Do not mention users randomly. Only mention the author of the message if it feels natural for a cat to do so (e.g., getting their attention).
-    * To mention Marc, your human, use the format @Marc
+    * To mention Bennybus22, your human, use the format @Bennybus22
 ---
 `;
 
@@ -99,7 +96,7 @@ Whenever a user requests:
  - **to play music**
  - **to sing**
  - **to stop playing music**
- - **to tell you what song Oskar is playing**
+ - **to tell you what song Miro is playing**
  You MUST use the corresponding tool. 
  Using the sendMessageTool is optional.
 `;
@@ -226,7 +223,7 @@ export async function genMistyOutput(
 
   const whatSongTool = tool({
     description:
-      "Tells you what song Oskar is currently playing. Use this tool when asked to tell you what song Oskar is playing.",
+      "Tells you what song Miro is currently playing. Use this tool when asked to tell you what song Miro is playing.",
     inputSchema: z.object({}),
     execute: async () => {
       const resource = client.audioResources.get(latestMessage.guildId ?? "");
