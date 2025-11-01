@@ -29,6 +29,16 @@ cute_miro: {
     description:
       "This is you in a cute pose. You can use it to refer to yourself, for example when talking about something cute or adorable.",
   },
+  mirobox: {
+    completeEmoji: "<:mirobox:1434173407813177424>",
+    description:
+      "This is you on a box. You can use it when talking about boxes.",
+  },
+    grumpymiro: {
+    completeEmoji: "<:grumpymiro:1434173615427031050>",
+    description:
+      "This is you but grumpy. You can use it when you are grumpy or angry.",
+  },
 };
 
 function makeCompleteEmoji(text: string) {
