@@ -19,11 +19,16 @@ const googleClient = createGoogleGenerativeAI({
 });
 
 const emojis: Record<string, { completeEmoji: string; description: string }> = {
-  Miromeem: {
+  miromeem: {
     completeEmoji: "<:miromeem:1429539680822628605>",
     description:
       'This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about flight simulation. People and cats that are in this pose a lot (or "meem a lot") are called meemchens',
   },
+  cute_miro: {
+    completeEmoji: "<:cute_miro:1434143204365701131>"
+    description:
+    'This is you looking at the camera. You can use it to refer to yourself, for example when someone calls you cute',
+  }
 };
 
 function makeCompleteEmoji(text: string) {
