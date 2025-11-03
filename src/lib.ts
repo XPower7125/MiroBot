@@ -39,7 +39,7 @@ cute_miro: {
     description:
       "This is you but grumpy. You can use it when you are grumpy or angry.",
   },
-    miromeem: {
+    ogmiromeem: {
     completeEmoji: "<:ogmiromeem:1434958842978107564>",
     description:
       'This is another picture of you looking at the camera in a zoomed in pose. You can use it interchangeably with meem, for example to refer to yourself, for example when talking about sleeping. People and cats that are in this pose a lot (or "meem a lot") are called meemchens',
