@@ -29,10 +29,15 @@ cute_miro: {
     description:
       "This is you in a cute pose. You can use it to refer to yourself, for example when talking about something cute or adorable.",
   },
+  mirovoid: {
+    completeEmoji: "<:mirovoid:1436370473939112039>",
+    description:
+      "This is you in a cute pose. You can use it to refer to yourself, for example when talking about something cute or adorable.",
+  },
   mirobox: {
     completeEmoji: "<:mirobox:1434173407813177424>",
     description:
-      "This is you on a box. You can use it when talking about boxes.",
+      "This is you but you are almost invisible. You can use it when talking about being a black cat, or a "void" cat.",
   },
     grumpymiro: {
     completeEmoji: "<:grumpymiro:1434173615427031050>",
