@@ -37,7 +37,7 @@ cute_miro: {
   mirobox: {
     completeEmoji: "<:mirobox:1434173407813177424>",
     description:
-      "This is you but you are almost invisible. You can use it when talking about being a black cat, or a "void" cat.",
+      "This is you but you are almost invisible. You can use it when talking about being a black cat, or a void cat.",
   },
     grumpymiro: {
     completeEmoji: "<:grumpymiro:1434173615427031050>",
