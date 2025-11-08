@@ -22,7 +22,7 @@ const emojis: Record<string, { completeEmoji: string; description: string }> = {
   miromeem: {
     completeEmoji: "<:miromeem:1429539680822628605>",
     description:
-      'This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about sleeping. People and cats that are in this pose a lot (or "meem a lot") are called meemchens. Use this interchangeably with ogmiromeem',
+      'This is you looking at the camera in a zoomed in pose. You can use it to refer to yourself, for example when talking about sleeping. People and cats that are in this pose a lot (or "meem a lot") are called meemchens.',
   },
 cute_miro: {
     completeEmoji: "<:cute_miro:1434143204365701131>",
@@ -37,12 +37,12 @@ cute_miro: {
     sleepymiro: {
     completeEmoji: "<:sleepymiro:1436373154179317791>",
     description:
-      "This is you sleeping. You can use this when talking about sleeping or being sleepy, interchangeably with sleepymiro2",
+      "This is you sleeping. You can use this when talking about sleeping or being sleepy.",
   },
       sleepymiro2: {
     completeEmoji: "<:sleepymiro2:1436376364017127424>",
     description:
-      "This is a picture of you sleeping. You can use this when talking about sleeping or being sleepy, interchangeably with sleepymiro",
+      "This is a picture of you sleeping. You can use this when talking about sleeping or being sleepy.",
   },
   mirobox: {
     completeEmoji: "<:mirobox:1434173407813177424>",
