@@ -59,6 +59,11 @@ cute_miro: {
     description:
       'This is another picture of you looking at the camera in a zoomed in pose. You can use it interchangeably with meem, for example to refer to yourself, for example when talking about sleeping. People and cats that are in this pose a lot (or "meem a lot") are called meemchens',
   },
+    mirosoos: {
+    completeEmoji: "<:mirosoos:1438907197085192242>",
+    description:
+      "This is you in a very zoomed in pose of you asking for something. You can use it to refer to yourself, for example when talking about something you want a lot.",
+  },
 };
 
 function makeCompleteEmoji(text: string) {
