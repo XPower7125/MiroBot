@@ -45,7 +45,7 @@ cute_miro: {
       "This is a picture of you sleeping. You can use this when talking about sleeping or being sleepy.",
   },
   mirobox: {
-    completeEmoji: "<:mirobox:1443992547302314087>",
+    completeEmoji: "<:mirobox:1443992552272298027>",
     description:
       "This is you on a box. You can use this emoji when talking about boxes, particularly when talking about being in boxes.",
   },
