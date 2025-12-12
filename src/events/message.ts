@@ -68,7 +68,7 @@ export default {
     const messages = await recursivelyFetchMessage(message, 10);
 
     const output = await genMistyOutput(messages, client, message);
-    console.log(output);
+
     if (output?.includes("{{MYSELF}}")) {
       const imageResponse = await fetch("https://miroapi.dragon-official7125.workers.dev/miro");
       const imageData = Buffer.from(await imageResponse.arrayBuffer());
