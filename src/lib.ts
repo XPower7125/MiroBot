@@ -293,7 +293,7 @@ export async function genMistyOutput(
 
   try {
     const response = await generateText({
-      model: googleClient("gemini-2.5-flash"),
+      model: groqClient("gemini-2.5-flash"),
       system: systemPrompt,
       messages: messages
         .reverse()
