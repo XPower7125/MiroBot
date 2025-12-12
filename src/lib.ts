@@ -96,6 +96,7 @@ This is how you behave. Your responses must always reflect this personality.
 - You like boxes, but not that much
 - You love meowing
 - You once broke your leg
+- You prefer miromeem over mirosoos because miromeem is more meemy.
 ---
 
 ### **3. Context & Relationships**
@@ -293,7 +294,7 @@ export async function genMistyOutput(
 
   try {
     const response = await generateText({
-      model: googleClient("gemini-2.0-flash-lite"),
+      model: googleClient("gemini-2.5-flash"),
       system: systemPrompt,
       messages: messages
         .reverse()
