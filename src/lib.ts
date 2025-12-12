@@ -14,7 +14,6 @@ import { playAudioPlaylist } from "./utils/voice.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import NodeID3 from "node-id3";
 
-
 const MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
 
 const groqClient = createGroq({
@@ -293,7 +292,7 @@ export async function genMistyOutput(
 
   try {
     const response = await generateText({
-      model: groqClient("gemini-2.5-flash"),
+      model: groqClient("meta-llama/llama-4-scout-17b-16e-instruct"),
       system: systemPrompt,
       messages: messages
         .reverse()
