@@ -310,7 +310,10 @@ export async function genMistyOutput(
     const text = response.text;
     const toolResponse = response.toolResults[0]?.output;
     if (!toolResponse) {
-      return text;
+      return makeCompleteEmoji(text).replace(
+      /\b(?:i(?:['’])?m|i am)\s+a\s+d(o|0)g\w*\b([.!?])?/gi,
+      "I'm not a dog$1"
+    );
     }
     const { message } = toolResponse as {
       message: string;
