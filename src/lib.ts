@@ -14,8 +14,11 @@ import { playAudioPlaylist } from "./utils/voice.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import NodeID3 from "node-id3";
 
-const googleClient = createGoogleGenerativeAI({
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+
+const MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+
+const groqClient = createGroq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 const emojis: Record<string, { completeEmoji: string; description: string }> = {
