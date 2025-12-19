@@ -14,7 +14,7 @@ import { playAudioPlaylist } from "./utils/voice.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import NodeID3 from "node-id3";
 
-const MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+const MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
 
 const groqClient = createGroq({
   apiKey: process.env.GROQ_API_KEY,
