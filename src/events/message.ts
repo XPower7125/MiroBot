@@ -86,7 +86,10 @@ export default {
         await message.reply(loadedJson.cleanContent);
         return;
       }
-      return await message.reply(output);
+      await message.reply({
+        content: output.replace("@everyone", ""),
+        allowedMentions: { roles: [] },
+      });
     } catch {
       if (output.includes('"avatar')) {
         // Temp fix?
