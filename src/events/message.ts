@@ -87,9 +87,8 @@ export default {
         return;
       }
       await message.reply({
-        content: output.replace("@everyone", "@ everyone"),
-        content: output.replace("@here", "@ here"),
-        allowedMentions: { roles: [], parse: ["roles", "users"] },
+        content: output.replace("@everyone", ""),
+        allowedMentions: { roles: [] },
       });
     } catch {
       if (output.includes('"avatar')) {
